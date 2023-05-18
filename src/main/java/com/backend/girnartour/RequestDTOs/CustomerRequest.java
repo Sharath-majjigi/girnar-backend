@@ -1,0 +1,40 @@
+package com.backend.girnartour.RequestDTOs;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.*;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class CustomerRequest {
+
+
+    @NotEmpty
+    public String customerName;
+    @NotEmpty
+    public String addressLine1;
+
+    public String addressLine2;
+    @NotEmpty
+    public String city;
+    @NotNull
+    @Size(max=6,min=6,message = "Enter a valid 6 digit postal code")
+    public String postalCode;
+
+    @NotEmpty
+    public String country;
+
+    @NotEmpty
+    @Size(min=10,max=10,message = "Enter a Valid 10 digit contact number")
+    public String telephone;
+
+    @NotEmpty
+    @Email(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}", flags = Pattern.Flag.CASE_INSENSITIVE,message = "Enter a valid Email !")
+    public String email;
+
+    public String notes;
+
+}
