@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SalesCategoryDAO extends JpaRepository<SalesCategory,String> {
+public interface SalesCategoryDAO extends JpaRepository<SalesCategory,Integer> {
 }

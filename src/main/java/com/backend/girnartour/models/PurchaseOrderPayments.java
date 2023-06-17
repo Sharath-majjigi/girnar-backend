@@ -20,25 +20,6 @@ public class PurchaseOrderPayments {
     @Column(name = "payment_id")
     private String id;
 
-//    @Column(name = "po_date")
-//    private String poDate;
-//
-//    private String description;
-//
-//    private String remarks;
-//
-//    @Column(name = "po_amount")
-//    private Double amount;
-//
-//    @Column(name = "total_paid")
-//    private Double totalPaid;
-//
-//    @Column(name = "vendor_name")
-//    private String vendorName;
-//
-//@OneToMany(mappedBy = "purchaseOrderPayments",cascade = CascadeType.ALL)
-//private List<PaymentDetail> paymentDetails=new ArrayList<>();
-
     @OneToOne
     @JoinColumn(name = "po_number")
     private PurchaseOrderHeader purchaseOrderHeader;

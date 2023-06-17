@@ -1,25 +1,19 @@
 package com.backend.girnartour.services;
 
 import com.backend.girnartour.RequestDTOs.*;
-import com.backend.girnartour.ResponseDTOs.ResponseMessage;
+import com.backend.girnartour.RequestDTOs.UpdateDTOs.UserUpdateDTO;
 import com.backend.girnartour.ResponseDTOs.UserResponseDTO;
-import com.backend.girnartour.ResponseDTOs.VendorResponseDTO;
 import com.backend.girnartour.constants.UserConstants;
-import com.backend.girnartour.exception.InvalidOTPException;
 import com.backend.girnartour.exception.PasswordException;
 import com.backend.girnartour.exception.ResourceNotFoundException;
 import com.backend.girnartour.models.User;
-import com.backend.girnartour.models.Vendor;
 import com.backend.girnartour.repository.UserDAO;
 import com.backend.girnartour.security.JwtAuthResponse;
 import com.backend.girnartour.security.JwtTokenHelper;
-import lombok.RequiredArgsConstructor;
-import net.bytebuddy.utility.RandomString;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.beans.FeatureDescriptor;
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -61,7 +54,7 @@ public class UserService {
     private JwtTokenHelper jwtTokenHelper;
 
     @Autowired
-    private CacheManager cacheManager;
+    private IdGenerationService service;
 
     public UserResponseDTO saveNewUser(UserRequestDTO userRequestDTO){
         User saveUser=modelMapper.map(userRequestDTO,User.class);
@@ -187,7 +180,7 @@ public class UserService {
         return ResponseEntity.ok(responseDTO);
     }
 
-    public ResponseEntity<?> updateUser(String id,UserUpdateDTO userUpdateDTO){
+    public ResponseEntity<?> updateUser(String id, UserUpdateDTO userUpdateDTO){
 
         if(userUpdateDTO.getPassword()!=null && userUpdateDTO.getConfirmPass()!=null){
             if(!(userUpdateDTO.getPassword().equals(userUpdateDTO.getConfirmPass()))){
@@ -254,12 +247,12 @@ public class UserService {
         return authResponse;
     }
 
-    public ResponseEntity<?> changeUserPass(String id,ChangePassword changePassword) {
-        User user;
+    public ResponseEntity<?> changeUserPass(ChangePassword changePassword) {
+       User user;
         try{
-            user=userDAO.findById(id).get();
+            user=userDAO.findByEmail(changePassword.getEmail());
         }catch (Exception e){
-            throw new ResourceNotFoundException("User","Id",id);
+            throw new ResourceNotFoundException("User","Email",changePassword.getEmail());
         }
         if (changePassword.getPassword().equals(changePassword.getConfirmPassword())){
             user.setPassword(passwordEncoder.encode(changePassword.getPassword()));
@@ -267,6 +260,7 @@ public class UserService {
         }else {
             throw new PasswordException("Password","Confirm-Password");
         }
-        return new ResponseEntity<>(user,HttpStatus.OK);
+        UserResponseDTO responseDTO=modelMapper.map(user, UserResponseDTO.class);
+        return new ResponseEntity<>(responseDTO,HttpStatus.OK);
     }
 }

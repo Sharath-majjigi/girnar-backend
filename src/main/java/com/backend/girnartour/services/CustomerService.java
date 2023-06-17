@@ -1,17 +1,13 @@
 package com.backend.girnartour.services;
 
 import com.backend.girnartour.RequestDTOs.CustomerRequest;
-import com.backend.girnartour.RequestDTOs.CustomerUpdateDTO;
-import com.backend.girnartour.RequestDTOs.VendorRequestDTO;
-import com.backend.girnartour.RequestDTOs.VendorUpdateDTO;
+import com.backend.girnartour.RequestDTOs.UpdateDTOs.CustomerUpdateDTO;
 import com.backend.girnartour.ResponseDTOs.CustomerResponse;
 import com.backend.girnartour.ResponseDTOs.VendorResponseDTO;
 import com.backend.girnartour.exception.ResourceAlreadyExistsException;
 import com.backend.girnartour.exception.ResourceNotFoundException;
 import com.backend.girnartour.models.Customer;
-import com.backend.girnartour.models.Customer;
 import com.backend.girnartour.repository.CustomerDAO;
-import com.backend.girnartour.repository.VendorDAO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapperImpl;
@@ -36,6 +32,9 @@ public class CustomerService {
     @Autowired
     private ModelMapper modelMapper;
 
+    @Autowired
+    private IdGenerationService service;
+
     public ResponseEntity<?> addNewCustomer(CustomerRequest request){
         //check if previously exists [By name,email,telephone]
         String email=request.getEmail();
@@ -44,9 +43,9 @@ public class CustomerService {
         if(customerDAO.existsByEmail(email) || customerDAO.existsByCustomerName(name) || customerDAO.existsByTelephone(telephone)){
             throw new ResourceAlreadyExistsException("Customer","Name|Telephone|Email"+name+" "+telephone+" "+email);
         }
-        String random_sequence= String.format("%040d",new BigInteger(UUID.randomUUID().toString().replace("-",""),16));
+        String random_sequence= service.generateUniqueId(300000,"customer");
         Customer customer=modelMapper.map(request, Customer.class);
-        customer.setId(random_sequence.substring(1,6));
+        customer.setId(random_sequence);
         Customer saved=customerDAO.save(customer);
         CustomerResponse responseDTO=modelMapper.map(saved, CustomerResponse.class);
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);

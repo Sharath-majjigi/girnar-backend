@@ -26,7 +26,6 @@ public class POHeaderResponse {
     public String remarks;
     public Double amount;
 
-
     public Double sellAmount;
 
 

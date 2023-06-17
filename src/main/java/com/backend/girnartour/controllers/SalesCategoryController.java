@@ -1,6 +1,7 @@
 package com.backend.girnartour.controllers;
 
 import com.backend.girnartour.RequestDTOs.SalesCategoryRequest;
+import com.backend.girnartour.RequestDTOs.UpdateDTOs.UpdateSalesCategory;
 import com.backend.girnartour.services.SalesCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,9 +27,13 @@ public class SalesCategoryController {
     }
 
     @DeleteMapping("/{type}")
-    public ResponseEntity<?> deleteSalesCategory(@PathVariable String type){
+    public ResponseEntity<?> deleteSalesCategory(@PathVariable Integer type){
         return salesCategoryService.deleteSalesCategory(type);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateSalesCategory(@PathVariable Integer id, @RequestBody UpdateSalesCategory updateSalesCategory){
+        return salesCategoryService.updateSalesCategory(id, updateSalesCategory);
+    }
 
 }

@@ -1,8 +1,9 @@
 package com.backend.girnartour.services;
 
 import com.backend.girnartour.RequestDTOs.POHeaderRequest;
+import com.backend.girnartour.RequestDTOs.UpdateDTOs.UpdatePOH;
+import com.backend.girnartour.RequestDTOs.UpdateDTOs.UpdatePOHDetail;
 import com.backend.girnartour.ResponseDTOs.POHeaderResponse;
-import com.backend.girnartour.constants.UserConstants;
 import com.backend.girnartour.exception.ResourceNotFoundException;
 import com.backend.girnartour.models.*;
 import com.backend.girnartour.repository.*;
@@ -39,13 +40,19 @@ public class POHeaderService {
     @Autowired
     private PurchaseOrderPaymentsDAO paymentsDAO;
 
+    @Autowired
+    private SalesHeaderDAO salesHeaderDAO;
+
+    @Autowired
+    private IdGenerationService service;
+
     public ResponseEntity<?> createPurchaseOrderHeader(String userId, String vendorId, POHeaderRequest poHeaderRequest){
         User user=userDAO.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User","Id",userId));
         Vendor vendor=vendorDAO.findById(vendorId).orElseThrow(() -> new ResourceNotFoundException("Vendor","Id",vendorId));
 
         PurchaseOrderHeader poh=modelMapper.map(poHeaderRequest, PurchaseOrderHeader.class);
-        String random_sequence= String.format("%040d",new BigInteger(UUID.randomUUID().toString().replace("-",""),16));
-        poh.setId(random_sequence.substring(1,6));
+        String random_sequence= service.generateUniqueId(400000,"purchaseorderheader");
+        poh.setId(random_sequence);
         List<PurchaseOrderDetail> orderDetails=poHeaderRequest.getPod();
         for(PurchaseOrderDetail orderDetail:orderDetails){
             String uuid= String.format("%040d",new BigInteger(UUID.randomUUID().toString().replace("-",""),16));
@@ -89,6 +96,70 @@ public class POHeaderService {
         List<PurchaseOrderHeader> orderHeaders=poHeaderDAO.findAll();
         List<POHeaderResponse> responses=orderHeaders.stream().map(orders -> modelMapper.map(orders,POHeaderResponse.class)).collect(Collectors.toList());
         return new ResponseEntity<>(responses,HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> getAllPurchaseOrdersNotInSalesHeader(){
+        List<SalesHeader> salesHeaders=salesHeaderDAO.findAll();
+        List<PurchaseOrderHeader> purchaseOrderHeaders;
+
+        List<String> excludedIds=new ArrayList<>();
+        for(SalesHeader salesHeader:salesHeaders){
+            List<SalesDetail> salesDetails=salesHeader.getSalesDetailList();
+           for(SalesDetail detail:salesDetails){
+               excludedIds.add(detail.getPoNumber());
+           }
+        }
+        if(excludedIds!=null && !excludedIds.isEmpty()){
+            purchaseOrderHeaders=poHeaderDAO.findByIdNotIn(excludedIds);
+        }else{
+            purchaseOrderHeaders=poHeaderDAO.findAll();
+        }
+        List<POHeaderResponse> responses=purchaseOrderHeaders.stream().map(orders -> modelMapper.map(orders,POHeaderResponse.class)).collect(Collectors.toList());
+        return new ResponseEntity<>(responses,HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> updatePOH(UpdatePOH updatePOH, String id){
+        PurchaseOrderHeader poh = poHeaderDAO.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("POH","ID",id));
+
+        List<UpdatePOHDetail> updatePOHDetails=updatePOH.getPod();
+        for(int i=0; i<updatePOHDetails.size(); i++){
+            UpdatePOHDetail updatePOHDetail=updatePOHDetails.get(i);
+            PurchaseOrderDetail detail=pohDetailDAO.findByIdAndPurchaseOrderHeaderId(updatePOHDetail.getId(),id);
+
+            if(updatePOHDetail.getPaxName()!=null){
+                detail.setPaxName(updatePOHDetail.getPaxName());
+            }
+            if(updatePOHDetail.getDescription1()!=null){
+                detail.setDescription1(updatePOHDetail.getDescription1());
+            }
+            if(updatePOHDetail.getDescription2()!=null){
+                detail.setDescription2(updatePOHDetail.getDescription2());
+            }
+            if(updatePOHDetail.getSellPrice()!=null){
+                detail.setSellPrice(updatePOHDetail.getSellPrice());
+            }
+            if(updatePOHDetail.getPurchaseCost()!=null){
+                detail.setPurchaseCost(updatePOHDetail.getPurchaseCost());
+            }
+
+            pohDetailDAO.save(detail);
+        }
+
+        if(updatePOH.getPoDate()!=null){
+            poh.setPoDate(updatePOH.getPoDate());
+        }
+        if(updatePOH.getDescription()!=null){
+            poh.setDescription(updatePOH.getDescription());
+        }
+        if(updatePOH.getRemarks()!=null){
+            poh.setRemarks(updatePOH.getRemarks());
+        }
+        poh.setSellAmount(poh.getSellAmt());
+        poh.setAmount(poh.getTotalAmt());
+        PurchaseOrderHeader updatedPOH = poHeaderDAO.save(poh);
+        POHeaderResponse responseDTO=modelMapper.map(updatedPOH, POHeaderResponse.class);
+        return ResponseEntity.ok(responseDTO);
     }
 
     public ResponseEntity deletePurchaseOrderHeader(String pId){

@@ -1,4 +1,4 @@
-package com.backend.girnartour.RequestDTOs;
+package com.backend.girnartour.RequestDTOs.UpdateDTOs;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

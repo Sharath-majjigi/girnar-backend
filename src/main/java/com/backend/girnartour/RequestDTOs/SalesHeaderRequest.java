@@ -26,6 +26,10 @@ public class SalesHeaderRequest {
 
     public Double vatAmt;
 
+    public Double invoiceAmt;
+
+    public Double totalInvoiceAmt;
+
     public List<SalesDetail> salesDetailList;
 
 }

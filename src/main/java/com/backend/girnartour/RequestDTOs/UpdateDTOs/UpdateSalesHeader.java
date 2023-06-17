@@ -1,6 +1,5 @@
-package com.backend.girnartour.ResponseDTOs;
+package com.backend.girnartour.RequestDTOs.UpdateDTOs;
 
-import com.backend.girnartour.models.SalesDetail;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,30 +9,25 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SalesHeaderResponse {
+public class UpdateSalesHeader {
 
-    public String id;
-
-    public UserResponseDTO user;
 
     public String date;
 
     public String salesCat;
 
-    public CustomerResponse customer;
-
     public String description;
 
     public String message;
-
-    public Double invoiceAmt;
 
     public Double discount;
 
     public Double vatAmt;
 
+    public Double invoiceAmt;
+
     public Double totalInvoiceAmt;
 
-    public List<SalesDetail> salesDetailList;
+    public List<UpdateSalesDetail> salesDetailList;
 
 }

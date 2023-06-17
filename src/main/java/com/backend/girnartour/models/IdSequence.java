@@ -6,21 +6,21 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "sales_category")
-public class SalesCategory {
-
-
+@Table(name = "id_sequence")
+public class IdSequence {
     @Id
-    @GeneratedValue(strategy =GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
 
-    @Column(name = "sales_category")
-    private String category;
+    private String entityName;
 
-    private String description;
+    @Column(name = "next_value")
+    private int nextValue;
+
 
 }

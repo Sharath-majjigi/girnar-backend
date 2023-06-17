@@ -1,11 +1,12 @@
 package com.backend.girnartour.services;
 
 import com.backend.girnartour.RequestDTOs.SalesHeaderRequest;
+import com.backend.girnartour.RequestDTOs.UpdateDTOs.UpdateSalesDetail;
+import com.backend.girnartour.RequestDTOs.UpdateDTOs.UpdateSalesHeader;
 import com.backend.girnartour.ResponseDTOs.SalesHeaderResponse;
 import com.backend.girnartour.exception.ResourceNotFoundException;
 import com.backend.girnartour.models.*;
 import com.backend.girnartour.repository.*;
-import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -42,13 +43,16 @@ public class SalesHeaderService {
     @Autowired
     private SalesReceiptDAO salesReceiptDAO;
 
+    @Autowired
+    private IdGenerationService service;
+
     public ResponseEntity<?> createSalesHeader(String userId, String customerId, SalesHeaderRequest salesHeaderRequest){
         User user=userDAO.findById(userId).orElseThrow(()->new ResourceNotFoundException("User","Id",userId));
         Customer customer=customerDAO.findById(customerId).orElseThrow(()-> new ResourceNotFoundException("Customer","Id",customerId));
 
         SalesHeader salesHeader=new SalesHeader();
-        String uuid= String.format("%040d",new BigInteger(UUID.randomUUID().toString().replace("-",""),16));
-        salesHeader.setId(uuid.substring(1,6));
+        String uuid= service.generateUniqueId(500000,"salesheader");
+        salesHeader.setId(uuid);
         salesHeader.setUser(user);
         salesHeader.setCustomer(customer);
         salesHeader.setDate(salesHeaderRequest.getDate());
@@ -58,14 +62,14 @@ public class SalesHeaderService {
         salesHeader.setDiscount(salesHeaderRequest.getDiscount());
         salesHeader.setVatAmt(salesHeaderRequest.getVatAmt());
 
-        Double totalInvoice=0D;
+        Double invoiceAmt=0D;
         List<SalesDetail> salesDetailList=salesHeaderRequest.getSalesDetailList();
         for(SalesDetail detail: salesDetailList){
 //            PurchaseOrderHeader header=poHeaderDAO.findById()
             Double ia= poHeaderDAO.findByPOHId(detail.getPoNumber());
-            totalInvoice+=ia;
+            invoiceAmt+=ia;
         }
-        salesHeader.setInvoiceAmt(totalInvoice);
+        salesHeader.setInvoiceAmt(invoiceAmt);
         salesHeader.setTotalInvoiceAmt(salesHeader.TotalInvoiceAmount());
 
         List<SalesDetail> salesDetails=salesHeaderRequest.getSalesDetailList();
@@ -110,6 +114,49 @@ public class SalesHeaderService {
     public ResponseEntity<?> getSalesHeaderById(String id) {
         SalesHeader salesHeader=salesHeaderDAO.findById(id).orElseThrow(()->new ResourceNotFoundException("SalesHeader","Id",id));
         SalesHeaderResponse response=modelMapper.map(salesHeader,SalesHeaderResponse.class);
+        return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> updateSalesHeader(String id, UpdateSalesHeader updateSalesHeader){
+        SalesHeader salesHeader=salesHeaderDAO.findById(id).orElseThrow(() -> new ResourceNotFoundException("SalesHeader","Id",id));
+
+        List<UpdateSalesDetail> updateSalesDetails=updateSalesHeader.getSalesDetailList();
+        for(int i=0; i<updateSalesDetails.size(); i++){
+            UpdateSalesDetail updateSalesDetail=updateSalesDetails.get(i);
+            SalesDetail salesDetail=salesHeaderDetailDAO.findByIdAndSalesHeaderId(updateSalesDetail.getId(),id);
+
+            if(updateSalesDetail.getPoNumber()!=null){
+                salesDetail.setPoNumber(updateSalesDetail.getPoNumber());
+            }
+            salesHeaderDetailDAO.save(salesDetail);
+        }
+        if(updateSalesHeader.getDescription()!=null){
+            salesHeader.setDescription(updateSalesHeader.getDescription());
+        }
+        if(updateSalesHeader.getDate()!=null){
+            salesHeader.setDate(updateSalesHeader.getDate());
+        }
+        if(updateSalesHeader.getSalesCat()!=null){
+            salesHeader.setSalesCat(updateSalesHeader.getSalesCat());
+        }
+        if(updateSalesHeader.getMessage()!=null){
+            salesHeader.setMessage(updateSalesHeader.getMessage());
+        }
+        if(updateSalesHeader.getDiscount()!=null){
+            salesHeader.setDiscount(updateSalesHeader.getDiscount());
+        }
+        if(updateSalesHeader.getInvoiceAmt()!=null){
+            salesHeader.setInvoiceAmt(updateSalesHeader.getInvoiceAmt());
+        }
+        if(updateSalesHeader.getVatAmt()!=null){
+            salesHeader.setVatAmt(updateSalesHeader.getVatAmt());
+        }
+        if(updateSalesHeader.getTotalInvoiceAmt()!=null){
+            salesHeader.setTotalInvoiceAmt(updateSalesHeader.getTotalInvoiceAmt());
+        }
+
+        SalesHeader updatedSalesHeader=salesHeaderDAO.save(salesHeader);
+        SalesHeaderResponse response=modelMapper.map(updatedSalesHeader,SalesHeaderResponse.class);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 

@@ -2,22 +2,29 @@ package com.backend.girnartour.services;
 
 import com.backend.girnartour.RequestDTOs.POPRequestDTO;
 import com.backend.girnartour.RequestDTOs.POPaymentRequest;
+import com.backend.girnartour.RequestDTOs.UpdateDTOs.CustomerUpdateDTO;
+import com.backend.girnartour.RequestDTOs.UpdateDTOs.UpdatePOPayment;
 import com.backend.girnartour.ResponseDTOs.POPaymentResponse;
+import com.backend.girnartour.ResponseDTOs.VendorResponseDTO;
 import com.backend.girnartour.constants.UserConstants;
 import com.backend.girnartour.exception.ResourceNotFoundException;
 import com.backend.girnartour.models.*;
 import com.backend.girnartour.repository.*;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.beans.FeatureDescriptor;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class POPaymentService {
@@ -34,47 +41,13 @@ public class POPaymentService {
     @Autowired
     private POHeaderDAO poHeaderDAO;
 
-//    @Autowired
-//    private PaymentDetailDAO paymentDetailDAO;
 
     @Autowired
     private VendorDAO vendorDAO;
 
+    @Autowired
+    private IdGenerationService service;
 
-//    public ResponseEntity<?> createPurchaseOrderPayment(String userId, String pohID, POPaymentRequest paymentRequest){
-//        User user=userDAO.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User","Id",userId));
-//        PurchaseOrderHeader poh=poHeaderDAO.findById(pohID).orElseThrow(() -> new ResourceNotFoundException("POH","Id",pohID));
-//
-//        PurchaseOrderPayments orderPayments=modelMapper.map(paymentRequest, PurchaseOrderPayments.class);
-//        orderPayments.setId(UserConstants.random_sequence.substring(1,6));
-//
-//        List<PaymentDetail> paymentDetails=paymentRequest.getPaymentDetails();
-//        for(PaymentDetail paymentDetail:paymentDetails){
-//            String uuid= String.format("%040d",new BigInteger(UUID.randomUUID().toString().replace("-",""),16));
-//            paymentDetail.setId(uuid.substring(1,6));
-//        }
-//
-//        List<PurchaseOrderPayments> orderPaymentsList=user.getPurchaseOrderPayments();
-//        orderPaymentsList.add(orderPayments);
-//        userDAO.save(user);
-//
-//
-//        List<PaymentDetail> details=new ArrayList<>();
-//        for(PaymentDetail pd:paymentDetails){
-//            pd.setPurchaseOrderPayments(orderPayments);
-//            details.add(pd);
-//        }
-//        paymentDetailDAO.saveAllAndFlush(details);
-//        orderPayments.setPurchaseOrderHeader(poh);
-//        orderPayments.setUser(user);
-//        orderPayments.setPaymentDetails(paymentDetails);
-//        orderPayments.setTotalPaid(orderPayments.getTotalPaidAmt());
-//        PurchaseOrderPayments saved=paymentsDAO.save(orderPayments);
-//        POPaymentResponse response=modelMapper.map(saved,POPaymentResponse.class);
-//        response.setVendorName(poh.getVendorName());
-//        response.setAmount(poh.getTotalAmt());
-//        return new ResponseEntity<>(response, HttpStatus.OK);
-//    }
 
     public ResponseEntity<?> createPayment(String userId, String pohId, POPRequestDTO paymentRequest){
         User user=userDAO.findById(userId).orElseThrow(() ->new ResourceNotFoundException("User","Id",userId));
@@ -84,7 +57,7 @@ public class POPaymentService {
         List<POPaymentRequest> paymentRequests=paymentRequest.getRequests();
         for(POPaymentRequest request:paymentRequests){
             PurchaseOrderPayments pop=new PurchaseOrderPayments();
-            String uuid= String.format("%040d",new BigInteger(UUID.randomUUID().toString().replace("-",""),16));
+            String uuid= service.generateUniqueId(500000,"purchaseorderpayment");
             pop.setId(uuid.substring(1,6));
             pop.setPurchaseOrderHeader(poh);
             pop.setDate(request.getDate());
@@ -106,6 +79,24 @@ public class POPaymentService {
         PurchaseOrderPayments payments=paymentsDAO.findById(popId).orElseThrow(()-> new ResourceNotFoundException("PurchaseOrderPayment","Id",popId));
         POPaymentResponse response=modelMapper.map(payments,POPaymentResponse.class);
         return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> updatePOP(List<UpdatePOPayment> updateDTOs){
+        for(int i=0; i<updateDTOs.size(); i++){
+            UpdatePOPayment updatePOPayment=updateDTOs.get(i);
+            PurchaseOrderPayments existingPOP = paymentsDAO.findById(updatePOPayment.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("POP","ID",updatePOPayment.getId()));
+            BeanUtils.copyProperties(updatePOPayment, existingPOP, getNullPropertyNames(updatePOPayment));
+            paymentsDAO.save(existingPOP);
+        }
+        return new ResponseEntity<>("Updated !",HttpStatus.OK);
+    }
+    private static String[] getNullPropertyNames(Object source) {
+        BeanWrapperImpl src = new BeanWrapperImpl(source);
+        return Stream.of(src.getPropertyDescriptors())
+                .map(FeatureDescriptor::getName)
+                .filter(propertyName -> src.getPropertyValue(propertyName) == null)
+                .toArray(String[]::new);
     }
 
     public ResponseEntity deletePurchaseOrderPaymentsById(String popId){

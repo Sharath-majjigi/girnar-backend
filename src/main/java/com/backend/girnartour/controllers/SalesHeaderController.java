@@ -1,6 +1,7 @@
 package com.backend.girnartour.controllers;
 
 import com.backend.girnartour.RequestDTOs.SalesHeaderRequest;
+import com.backend.girnartour.RequestDTOs.UpdateDTOs.UpdateSalesHeader;
 import com.backend.girnartour.services.SalesHeaderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,11 @@ public class SalesHeaderController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getSalesHeaderById(@PathVariable String id){
         return salesHeaderService.getSalesHeaderById(id);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateSalesHeader(@PathVariable String id, @RequestBody UpdateSalesHeader updateSalesHeader){
+        return salesHeaderService.updateSalesHeader(id, updateSalesHeader);
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteSalesHeader(@PathVariable String id){

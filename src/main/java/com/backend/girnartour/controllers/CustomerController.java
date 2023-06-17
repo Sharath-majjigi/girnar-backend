@@ -1,8 +1,7 @@
 package com.backend.girnartour.controllers;
 
 import com.backend.girnartour.RequestDTOs.CustomerRequest;
-import com.backend.girnartour.RequestDTOs.CustomerUpdateDTO;
-import com.backend.girnartour.services.CustomerService;
+import com.backend.girnartour.RequestDTOs.UpdateDTOs.CustomerUpdateDTO;
 import com.backend.girnartour.services.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

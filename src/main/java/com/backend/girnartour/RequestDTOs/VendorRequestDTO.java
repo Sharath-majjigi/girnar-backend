@@ -20,14 +20,14 @@ public class VendorRequestDTO {
     @NotEmpty
     public String city;
     @NotNull
-    @Size(max=6,min=6,message = "Enter a valid 6 digit postal code")
+    @Size(max=10,min=3,message = "Enter a valid postal code")
     public String postalCode;
 
     @NotEmpty
     public String country;
 
     @NotEmpty
-    @Size(min=10,max=10,message = "Enter a Valid 10 digit contact number")
+    @Size(min=6,max=15,message = "Enter a Valid contact number")
     public String telephone;
 
     @NotEmpty

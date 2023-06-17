@@ -1,13 +1,9 @@
 package com.backend.girnartour.controllers;
 
-import com.backend.girnartour.RequestDTOs.UserRequestDTO;
-import com.backend.girnartour.RequestDTOs.UserUpdateDTO;
 import com.backend.girnartour.RequestDTOs.VendorRequestDTO;
-import com.backend.girnartour.RequestDTOs.VendorUpdateDTO;
-import com.backend.girnartour.ResponseDTOs.UserResponseDTO;
+import com.backend.girnartour.RequestDTOs.UpdateDTOs.VendorUpdateDTO;
 import com.backend.girnartour.services.VendorService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

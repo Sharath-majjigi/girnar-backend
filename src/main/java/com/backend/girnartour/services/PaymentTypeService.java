@@ -2,14 +2,22 @@ package com.backend.girnartour.services;
 
 
 import com.backend.girnartour.RequestDTOs.PaymentTypeRequest;
+import com.backend.girnartour.RequestDTOs.UpdateDTOs.UpdatePaymentType;
 import com.backend.girnartour.exception.ResourceNotFoundException;
 import com.backend.girnartour.models.PaymentType;
 import com.backend.girnartour.repository.PaymentTypeDAO;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import java.beans.FeatureDescriptor;
+import java.math.BigInteger;
+import java.util.UUID;
+import java.util.stream.Stream;
 
 @Service
 public class PaymentTypeService {
@@ -22,7 +30,9 @@ public class PaymentTypeService {
     private ModelMapper modelMapper;
 
     public ResponseEntity<?> createNewPaymentType(PaymentTypeRequest paymentTypeRequest){
+        String random_sequence= String.format("%040d",new BigInteger(UUID.randomUUID().toString().replace("-",""),16));
         PaymentType toSave=modelMapper.map(paymentTypeRequest, PaymentType.class);
+        toSave.setId(random_sequence.substring(1,3));
        PaymentType saved=paymentTypeDAO.save(toSave);
        return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
@@ -41,4 +51,31 @@ public class PaymentTypeService {
         paymentTypeDAO.delete(paymentType);
         return new ResponseEntity<>("Deleted SuccessFully",HttpStatus.OK);
     }
+
+    public ResponseEntity<?> updatePaymentType(String id,UpdatePaymentType updatePaymentType){
+        PaymentType paymentType=paymentTypeDAO.findById(id).orElseThrow(() -> new ResourceNotFoundException("PaymentType","Id",id));
+        if(updatePaymentType.getDescription()!=null || !updatePaymentType.getDescription().isEmpty()){
+            paymentType.setDescription(updatePaymentType.getDescription());
+        }
+        if(updatePaymentType.getType()!=null || !updatePaymentType.getType().isEmpty()){
+            paymentType.setType(updatePaymentType.getType());
+        }
+        PaymentType updated=paymentTypeDAO.save(paymentType);
+        return new ResponseEntity<>(updated,HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> updatePaymentType(UpdatePaymentType updatePaymentType, String id){
+        PaymentType paymentType=paymentTypeDAO.findById(id).orElseThrow(() -> new ResourceNotFoundException("PaymentType","Id",id));
+        BeanUtils.copyProperties(updatePaymentType, paymentType, getNullPropertyNames(updatePaymentType));
+        PaymentType updatedPaymentType = paymentTypeDAO.save(paymentType);
+        return ResponseEntity.ok(updatedPaymentType);
+    }
+    private static String[] getNullPropertyNames(Object source) {
+        BeanWrapperImpl src = new BeanWrapperImpl(source);
+        return Stream.of(src.getPropertyDescriptors())
+                .map(FeatureDescriptor::getName)
+                .filter(propertyName -> src.getPropertyValue(propertyName) == null)
+                .toArray(String[]::new);
+    }
 }
+

@@ -1,15 +1,15 @@
-package com.backend.girnartour.RequestDTOs;
+package com.backend.girnartour.RequestDTOs.UpdateDTOs;
 
-import com.backend.girnartour.models.PurchaseOrderDetail;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class POHeaderRequest {
+public class UpdatePOH {
 
     public String poDate;
 
@@ -17,6 +17,5 @@ public class POHeaderRequest {
 
     public String remarks;
 
-    public List<PurchaseOrderDetail> pod;
-
+    public List<UpdatePOHDetail> pod;
 }

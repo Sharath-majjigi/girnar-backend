@@ -17,20 +17,6 @@ public class SalesDetail {
 
     @Id
     private String id;
-//
-//    private String purchaseNumber;
-//
-//    private String date;
-//
-//    private String description;
-//
-//    private Double totalPurchaseCost;
-//
-//    private Double totalSellPrice;
-//
-//    @ManyToOne
-//    private SalesHeader salesHeader;
-
 
     @Column(name = "po_number")
     private String poNumber;

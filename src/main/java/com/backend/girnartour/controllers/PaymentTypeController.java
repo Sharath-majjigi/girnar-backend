@@ -1,6 +1,7 @@
 package com.backend.girnartour.controllers;
 
 import com.backend.girnartour.RequestDTOs.PaymentTypeRequest;
+import com.backend.girnartour.RequestDTOs.UpdateDTOs.UpdatePaymentType;
 import com.backend.girnartour.services.PaymentTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -31,5 +32,9 @@ public class PaymentTypeController {
         return paymentTypeService.deletePaymentType(type);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updatePaymentType(@PathVariable String id, @RequestBody UpdatePaymentType updatePaymentType){
+        return paymentTypeService.updatePaymentType(id, updatePaymentType);
+    }
 
 }

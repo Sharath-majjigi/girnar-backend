@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PohDetailDAO extends JpaRepository<PurchaseOrderDetail,String> {
+
+    PurchaseOrderDetail findByIdAndPurchaseOrderHeaderId(String id,String pohId);
 }

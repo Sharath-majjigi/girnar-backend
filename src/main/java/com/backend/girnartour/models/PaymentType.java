@@ -15,6 +15,8 @@ public class PaymentType {
 
 
     @Id
+    private String id;
+
     @Column(name = "payment_type")
     private String type;
 

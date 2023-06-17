@@ -6,4 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface SalesHeaderDetailDAO extends JpaRepository<SalesDetail,String> {
+
+    SalesDetail findByIdAndSalesHeaderId(String id, String POHId);
+
 }

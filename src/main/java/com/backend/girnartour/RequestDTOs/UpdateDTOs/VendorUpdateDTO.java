@@ -1,4 +1,4 @@
-package com.backend.girnartour.RequestDTOs;
+package com.backend.girnartour.RequestDTOs.UpdateDTOs;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -20,12 +20,12 @@ public class VendorUpdateDTO {
 
     public String city;
 
-    @Size(max=6,min=6,message = "Enter a valid 6 digit postal code")
+    @Size(max=10,min=3,message = "Enter a valid postal code")
     public Integer postalCode;
 
     public String country;
 
-    @Size(min=10,max=10,message = "Enter a Valid 10 digit contact number")
+    @Size(min=6,max=15,message = "Enter a Valid contact number")
     public String telephone;
 
     @NotEmpty

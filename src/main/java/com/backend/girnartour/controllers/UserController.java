@@ -1,7 +1,7 @@
 package com.backend.girnartour.controllers;
 
 import com.backend.girnartour.RequestDTOs.*;
-import com.backend.girnartour.ResponseDTOs.ResponseMessage;
+import com.backend.girnartour.RequestDTOs.UpdateDTOs.UserUpdateDTO;
 import com.backend.girnartour.ResponseDTOs.UserResponseDTO;
 import com.backend.girnartour.constants.UserConstants;
 import com.backend.girnartour.exception.ResourceNotFoundException;
@@ -79,10 +79,9 @@ public class UserController {
         return userService.updateUser(id,updateDTO);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    @PatchMapping("/change-password/{id}")
-    public ResponseEntity<?> changePassword(@PathVariable String id,@RequestBody ChangePassword changePassword){
-        return userService.changeUserPass(id,changePassword);
+    @PatchMapping("/change-password")
+    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePassword changePassword){
+        return userService.changeUserPass(changePassword);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
