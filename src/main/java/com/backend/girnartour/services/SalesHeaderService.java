@@ -62,7 +62,7 @@ public class SalesHeaderService {
         salesHeader.setDiscount(salesHeaderRequest.getDiscount());
         salesHeader.setVatAmt(salesHeaderRequest.getVatAmt());
 
-        Double invoiceAmt=0D;
+        Double invoiceAmt=0.0;
         List<SalesDetail> salesDetailList=salesHeaderRequest.getSalesDetailList();
         for(SalesDetail detail: salesDetailList){
 //            PurchaseOrderHeader header=poHeaderDAO.findById()

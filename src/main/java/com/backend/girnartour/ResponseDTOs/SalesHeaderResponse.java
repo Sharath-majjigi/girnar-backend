@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import java.util.List;
 
 @Data
@@ -33,6 +34,8 @@ public class SalesHeaderResponse {
     public Double vatAmt;
 
     public Double totalInvoiceAmt;
+
+    public Double totalAmountPaid;
 
     public List<SalesDetail> salesDetailList;
 

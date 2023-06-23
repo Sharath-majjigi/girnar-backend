@@ -51,6 +51,9 @@ public class SalesHeader {
     @Column(name = "invoice_total")
     private Double totalInvoiceAmt;
 
+    @Column(name = "total_amount_paid")
+    public Double totalAmountPaid;
+
     @OneToMany(mappedBy = "salesHeader",cascade = CascadeType.ALL)
     private List<SalesDetail> salesDetailList;
 

@@ -50,11 +50,13 @@ public class SalesReceiptService {
         User user=userDAO.findById(userid).orElseThrow(() ->new ResourceNotFoundException("User","Id",userid));
         SalesHeader sh=salesHeaderDAO.findById(salesHeaderId).orElseThrow(() ->new ResourceNotFoundException("SalesHeader","Id",salesHeaderId));
 
+        Double totalAmountPaid=0.0;
         List<SalesReceiptRequest> salesReceiptRequestList=salesReceiptDTO.getRequests();
         for(SalesReceiptRequest request:salesReceiptRequestList){
             SalesReceipts salesReceipts=new SalesReceipts();
             String uuid= service.generateUniqueId(600000,"salesreceipt");
             salesReceipts.setId(uuid);
+            totalAmountPaid=totalAmountPaid+request.getAmountReceived();
             salesReceipts.setSalesHeader(sh);
             salesReceipts.setDate(request.getDate());
             salesReceipts.setAmountReceived(request.getAmountReceived());
@@ -63,6 +65,9 @@ public class SalesReceiptService {
             salesReceipts.setUser(user);
             salesReceiptDAO.save(salesReceipts);
         }
+        Double total= (sh.getTotalAmountPaid()!=null ? sh.getTotalAmountPaid() : 0.0);
+        sh.setTotalAmountPaid(totalAmountPaid+total);
+        salesHeaderDAO.save(sh);
         return new ResponseEntity<>("Successfully Created",HttpStatus.CREATED);
     }
 

@@ -2,6 +2,7 @@ package com.backend.girnartour.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -47,12 +48,15 @@ public class PurchaseOrderHeader {
     @OneToMany(mappedBy = "purchaseOrderHeader",cascade = CascadeType.ALL)
     private List<PurchaseOrderDetail> pod=new ArrayList<>();
 
+    @Column(name = "total_amount_paid")
+    public Double totalAmountPaid;
+
     @Transient
     public Double getTotalAmt(){
         Double sum= 0D;
         List<PurchaseOrderDetail> purchaseOrderDetails=getPod();
-        for(PurchaseOrderDetail od:purchaseOrderDetails){
-            sum+=od.getPurchaseCost();
+        for(PurchaseOrderDetail od:purchaseOrderDetails) {
+            sum += od.getPurchaseCost();
         }
         return sum;
     }

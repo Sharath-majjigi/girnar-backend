@@ -10,6 +10,7 @@ import com.backend.girnartour.constants.UserConstants;
 import com.backend.girnartour.exception.ResourceNotFoundException;
 import com.backend.girnartour.models.*;
 import com.backend.girnartour.repository.*;
+import org.hibernate.cfg.annotations.Nullability;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapperImpl;
@@ -53,12 +54,13 @@ public class POPaymentService {
         User user=userDAO.findById(userId).orElseThrow(() ->new ResourceNotFoundException("User","Id",userId));
         PurchaseOrderHeader poh=poHeaderDAO.findById(pohId).orElseThrow(() ->new ResourceNotFoundException("POH","Id",pohId));
 //        Vendor vendor=vendorDAO.findById(vendorId).orElseThrow(() ->new ResourceNotFoundException("Vendor","Id",vendorId));
-
+        Double totalAmountPaid=0.0;
         List<POPaymentRequest> paymentRequests=paymentRequest.getRequests();
         for(POPaymentRequest request:paymentRequests){
             PurchaseOrderPayments pop=new PurchaseOrderPayments();
             String uuid= service.generateUniqueId(500000,"purchaseorderpayment");
-            pop.setId(uuid.substring(1,6));
+            pop.setId(uuid);
+            totalAmountPaid = totalAmountPaid + request.getAmountPaid();
             pop.setPurchaseOrderHeader(poh);
             pop.setDate(request.getDate());
             pop.setAmountPaid(request.getAmountPaid());
@@ -67,6 +69,10 @@ public class POPaymentService {
             pop.setUser(user);
             paymentsDAO.save(pop);
         }
+
+        Double total= (poh.getTotalAmountPaid()!=null ? poh.getTotalAmountPaid() : 0.0);
+        poh.setTotalAmountPaid(totalAmountPaid+total);
+        poHeaderDAO.save(poh);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
     public ResponseEntity<?> getAllPurchaseOrderPayments(){

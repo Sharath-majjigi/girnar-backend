@@ -37,4 +37,6 @@ public class POHeaderResponse {
 
     public List<PurchaseOrderDetail> pod;
 
+    public Double totalAmountPaid;
+
 }

@@ -79,6 +79,7 @@ public class POHeaderService {
         poh.setVendor(vendor);
         poh.setAmount(poh.getTotalAmt());
         poh.setSellAmount(poh.getSellAmt());
+//        poh.setTotalAmountPaid(poh.getTotalAmt());
 //        poh.setVendorName(vendor.getVendorName());
         PurchaseOrderHeader saved=poHeaderDAO.save(poh);
         POHeaderResponse response=modelMapper.map(saved,POHeaderResponse.class);
