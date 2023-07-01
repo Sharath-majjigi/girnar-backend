@@ -63,8 +63,8 @@ public class SalesHeader {
         BigDecimal ia=getInvoiceAmt();
         BigDecimal va=getVatAmt();
         BigDecimal da=getDiscount();
-        return ia.subtract(da).add(va);
-
+        BigDecimal ans= ia.add(va);
+        return ans.subtract(da);
     }
 
 

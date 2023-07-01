@@ -66,7 +66,7 @@ public class SalesHeaderService {
         for(SalesDetail detail: salesDetailList){
 //            PurchaseOrderHeader header=poHeaderDAO.findById()
             BigDecimal ia= poHeaderDAO.findByPOHId(detail.getPoNumber());
-            invoiceAmt.add(ia);
+            invoiceAmt=invoiceAmt.add(ia);
         }
         salesHeader.setInvoiceAmt(invoiceAmt);
         salesHeader.setTotalInvoiceAmt(salesHeader.TotalInvoiceAmount());
