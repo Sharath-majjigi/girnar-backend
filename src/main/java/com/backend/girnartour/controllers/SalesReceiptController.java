@@ -19,7 +19,7 @@ public class SalesReceiptController {
     private SalesReceiptService salesReceiptService;
 
     @PostMapping("/{userid}/{salesHeaderId}")
-    public ResponseEntity<?> createSalesReceipt(@PathVariable String userid, @PathVariable String salesHeaderId, @RequestBody SalesReceiptDTO salesReceiptDTO){
+    public ResponseEntity<?> createSalesReceipt(@PathVariable String userid, @PathVariable Integer salesHeaderId, @RequestBody SalesReceiptDTO salesReceiptDTO){
         return salesReceiptService.createSalesReceipt(userid, salesHeaderId, salesReceiptDTO);
     }
 
@@ -30,7 +30,7 @@ public class SalesReceiptController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getSalesReceiptById(@PathVariable String id){
+    public ResponseEntity<?> getSalesReceiptById(@PathVariable Integer id){
         return salesReceiptService.getSalesReceiptById(id);
     }
 
@@ -40,7 +40,7 @@ public class SalesReceiptController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteSalesReceipt(@PathVariable String id){
+    public ResponseEntity<?> deleteSalesReceipt(@PathVariable Integer id){
         return salesReceiptService.deleteSalesReceipt(id);
     }
 }

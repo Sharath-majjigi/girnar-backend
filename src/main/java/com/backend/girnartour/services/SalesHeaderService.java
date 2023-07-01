@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,16 +44,14 @@ public class SalesHeaderService {
     @Autowired
     private SalesReceiptDAO salesReceiptDAO;
 
-    @Autowired
-    private IdGenerationService service;
 
-    public ResponseEntity<?> createSalesHeader(String userId, String customerId, SalesHeaderRequest salesHeaderRequest){
+    public ResponseEntity<?> createSalesHeader(String userId, Integer customerId, SalesHeaderRequest salesHeaderRequest){
         User user=userDAO.findById(userId).orElseThrow(()->new ResourceNotFoundException("User","Id",userId));
-        Customer customer=customerDAO.findById(customerId).orElseThrow(()-> new ResourceNotFoundException("Customer","Id",customerId));
+        Customer customer=customerDAO.findById(customerId).orElseThrow(()-> new ResourceNotFoundException("Customer","Id",String.valueOf(customerId)));
 
         SalesHeader salesHeader=new SalesHeader();
-        String uuid= service.generateUniqueId(500000,"salesheader");
-        salesHeader.setId(uuid);
+//        String uuid= service.generateUniqueId(500000,"salesheader");
+//        salesHeader.setId(uuid);
         salesHeader.setUser(user);
         salesHeader.setCustomer(customer);
         salesHeader.setDate(salesHeaderRequest.getDate());
@@ -62,25 +61,17 @@ public class SalesHeaderService {
         salesHeader.setDiscount(salesHeaderRequest.getDiscount());
         salesHeader.setVatAmt(salesHeaderRequest.getVatAmt());
 
-        Double invoiceAmt=0.0;
+        BigDecimal invoiceAmt=BigDecimal.ZERO;
         List<SalesDetail> salesDetailList=salesHeaderRequest.getSalesDetailList();
         for(SalesDetail detail: salesDetailList){
 //            PurchaseOrderHeader header=poHeaderDAO.findById()
-            Double ia= poHeaderDAO.findByPOHId(detail.getPoNumber());
-            invoiceAmt+=ia;
+            BigDecimal ia= poHeaderDAO.findByPOHId(detail.getPoNumber());
+            invoiceAmt.add(ia);
         }
         salesHeader.setInvoiceAmt(invoiceAmt);
         salesHeader.setTotalInvoiceAmt(salesHeader.TotalInvoiceAmount());
 
         List<SalesDetail> salesDetails=salesHeaderRequest.getSalesDetailList();
-        for(SalesDetail detail: salesDetails){
-//            SalesDetail newDetail=new SalesDetail();
-            String detailid= String.format("%040d",new BigInteger(UUID.randomUUID().toString().replace("-",""),16));
-            detail.setId(detailid.substring(1,6));
-//            newDetail.setPoNumber(detail.getPoNumber());
-//            newDetail.setSalesHeader(salesHeader);
-//            salesHeaderDetailDAO.save(newDetail);
-        }
 
         List<SalesHeader> salesHeaders=user.getSalesEntries();
         salesHeaders.add(salesHeader);
@@ -95,11 +86,12 @@ public class SalesHeaderService {
             sd.setSalesHeader(salesHeader);
             details.add(sd);
         }
-        salesHeaderDetailDAO.saveAllAndFlush(details);
+
 
 
         salesHeader.setSalesDetailList(salesHeaderRequest.getSalesDetailList());
         SalesHeader saved=salesHeaderDAO.save(salesHeader);
+        salesHeaderDetailDAO.saveAllAndFlush(details);
         SalesHeaderResponse response=modelMapper.map(saved,SalesHeaderResponse.class);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
 
@@ -111,14 +103,14 @@ public class SalesHeaderService {
         return new ResponseEntity<>(salesHeaderResponses,HttpStatus.OK);
     }
 
-    public ResponseEntity<?> getSalesHeaderById(String id) {
-        SalesHeader salesHeader=salesHeaderDAO.findById(id).orElseThrow(()->new ResourceNotFoundException("SalesHeader","Id",id));
+    public ResponseEntity<?> getSalesHeaderById(Integer id) {
+        SalesHeader salesHeader=salesHeaderDAO.findById(id).orElseThrow(()->new ResourceNotFoundException("SalesHeader","Id",String.valueOf(id)));
         SalesHeaderResponse response=modelMapper.map(salesHeader,SalesHeaderResponse.class);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
-    public ResponseEntity<?> updateSalesHeader(String id, UpdateSalesHeader updateSalesHeader){
-        SalesHeader salesHeader=salesHeaderDAO.findById(id).orElseThrow(() -> new ResourceNotFoundException("SalesHeader","Id",id));
+    public ResponseEntity<?> updateSalesHeader(Integer id, UpdateSalesHeader updateSalesHeader){
+        SalesHeader salesHeader=salesHeaderDAO.findById(id).orElseThrow(() -> new ResourceNotFoundException("SalesHeader","Id",String.valueOf(id)));
 
         List<UpdateSalesDetail> updateSalesDetails=updateSalesHeader.getSalesDetailList();
         for(int i=0; i<updateSalesDetails.size(); i++){
@@ -160,8 +152,8 @@ public class SalesHeaderService {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
-    public ResponseEntity<?> deleteSalesHeader(String id){
-        SalesHeader salesHeader=salesHeaderDAO.findById(id).orElseThrow(()->new ResourceNotFoundException("SalesHeader","Id",id));
+    public ResponseEntity<?> deleteSalesHeader(Integer id){
+        SalesHeader salesHeader=salesHeaderDAO.findById(id).orElseThrow(()->new ResourceNotFoundException("SalesHeader","Id",String.valueOf(id)));
         for(SalesDetail detail:salesHeader.getSalesDetailList()){
             salesHeaderDetailDAO.delete(detail);
         }

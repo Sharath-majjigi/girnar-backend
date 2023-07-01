@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface SalesReceiptDAO extends JpaRepository<SalesReceipts,String> {
+public interface SalesReceiptDAO extends JpaRepository<SalesReceipts,Integer> {
 
-    List<SalesReceipts> findAllBySalesHeaderId(String id);
+    List<SalesReceipts> findAllBySalesHeaderId(Integer id);
 }

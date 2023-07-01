@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.beans.FeatureDescriptor;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,20 +44,18 @@ public class SalesReceiptService {
     @Autowired
     private ModelMapper modelMapper;
 
-    @Autowired
-    private IdGenerationService service;
 
-    public ResponseEntity<?> createSalesReceipt(String userid, String salesHeaderId, SalesReceiptDTO salesReceiptDTO){
+    public ResponseEntity<?> createSalesReceipt(String userid, Integer salesHeaderId, SalesReceiptDTO salesReceiptDTO){
         User user=userDAO.findById(userid).orElseThrow(() ->new ResourceNotFoundException("User","Id",userid));
-        SalesHeader sh=salesHeaderDAO.findById(salesHeaderId).orElseThrow(() ->new ResourceNotFoundException("SalesHeader","Id",salesHeaderId));
+        SalesHeader sh=salesHeaderDAO.findById(salesHeaderId).orElseThrow(() ->new ResourceNotFoundException("SalesHeader","Id",String.valueOf(salesHeaderId)));
 
-        Double totalAmountPaid=0.0;
+        BigDecimal totalAmountPaid=BigDecimal.ZERO;
         List<SalesReceiptRequest> salesReceiptRequestList=salesReceiptDTO.getRequests();
         for(SalesReceiptRequest request:salesReceiptRequestList){
             SalesReceipts salesReceipts=new SalesReceipts();
-            String uuid= service.generateUniqueId(600000,"salesreceipt");
-            salesReceipts.setId(uuid);
-            totalAmountPaid=totalAmountPaid+request.getAmountReceived();
+//            String uuid= service.generateUniqueId(600000,"salesreceipt");
+//            salesReceipts.setId(uuid);
+            totalAmountPaid=totalAmountPaid.add(request.getAmountReceived());
             salesReceipts.setSalesHeader(sh);
             salesReceipts.setDate(request.getDate());
             salesReceipts.setAmountReceived(request.getAmountReceived());
@@ -65,8 +64,8 @@ public class SalesReceiptService {
             salesReceipts.setUser(user);
             salesReceiptDAO.save(salesReceipts);
         }
-        Double total= (sh.getTotalAmountPaid()!=null ? sh.getTotalAmountPaid() : 0.0);
-        sh.setTotalAmountPaid(totalAmountPaid+total);
+        BigDecimal total= (sh.getTotalAmountPaid()!=null ? sh.getTotalAmountPaid() : BigDecimal.ZERO);
+        sh.setTotalAmountPaid(totalAmountPaid.add(total));
         salesHeaderDAO.save(sh);
         return new ResponseEntity<>("Successfully Created",HttpStatus.CREATED);
     }
@@ -78,8 +77,8 @@ public class SalesReceiptService {
         return new ResponseEntity<>(salesReceiptResponses,HttpStatus.OK);
     }
 
-    public ResponseEntity<?> getSalesReceiptById(String id) {
-        SalesReceipts salesReceipt=salesReceiptDAO.findById(id).orElseThrow(()->new ResourceNotFoundException("SalesReceipt","Id",id));
+    public ResponseEntity<?> getSalesReceiptById(Integer id) {
+        SalesReceipts salesReceipt=salesReceiptDAO.findById(id).orElseThrow(()->new ResourceNotFoundException("SalesReceipt","Id",String.valueOf(id)));
         SalesReceiptResponse response=modelMapper.map(salesReceipt,SalesReceiptResponse.class);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
@@ -88,7 +87,7 @@ public class SalesReceiptService {
         for(int i=0; i<updateDTOs.size(); i++){
             UpdateSalesReceipt updateSalesReceipt=updateDTOs.get(i);
             SalesReceipts existingSalesReceipt = salesReceiptDAO.findById(updateSalesReceipt.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("SalesReceipt","ID",updateSalesReceipt.getId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("SalesReceipt","ID",String.valueOf(updateSalesReceipt.getId())));
             BeanUtils.copyProperties(updateSalesReceipt, existingSalesReceipt, getNullPropertyNames(updateSalesReceipt));
             salesReceiptDAO.save(existingSalesReceipt);
         }
@@ -102,8 +101,8 @@ public class SalesReceiptService {
                 .toArray(String[]::new);
     }
 
-    public ResponseEntity<?> deleteSalesReceipt(String id) {
-        SalesReceipts salesReceipt=salesReceiptDAO.findById(id).orElseThrow(()->new ResourceNotFoundException("SalesReceipt","Id",id));
+    public ResponseEntity<?> deleteSalesReceipt(Integer id) {
+        SalesReceipts salesReceipt=salesReceiptDAO.findById(id).orElseThrow(()->new ResourceNotFoundException("SalesReceipt","Id",String.valueOf(id)));
         salesReceiptDAO.delete(salesReceipt);
         return new ResponseEntity<>("SalesReceipt deleted successfully !",HttpStatus.OK);
     }

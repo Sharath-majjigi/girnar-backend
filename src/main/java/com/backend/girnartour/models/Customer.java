@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.text.DecimalFormat;
 import java.util.List;
 
 @Data
@@ -15,7 +16,8 @@ public class Customer {
 
     @Id
     @Column(name = "customer_code")
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
     @Column(name = "customer_name")
     private String customerName;

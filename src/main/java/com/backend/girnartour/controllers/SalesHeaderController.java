@@ -15,7 +15,7 @@ public class SalesHeaderController {
     private SalesHeaderService salesHeaderService;
 
     @PostMapping("/{userid}/{customerId}")
-    public ResponseEntity<?> createSalesHeader(@PathVariable String userid, @PathVariable String customerId, @RequestBody SalesHeaderRequest salesHeaderRequest){
+    public ResponseEntity<?> createSalesHeader(@PathVariable String userid, @PathVariable Integer customerId, @RequestBody SalesHeaderRequest salesHeaderRequest){
         return salesHeaderService.createSalesHeader(userid,customerId,salesHeaderRequest);
     }
 
@@ -25,16 +25,16 @@ public class SalesHeaderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getSalesHeaderById(@PathVariable String id){
+    public ResponseEntity<?> getSalesHeaderById(@PathVariable Integer id){
         return salesHeaderService.getSalesHeaderById(id);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateSalesHeader(@PathVariable String id, @RequestBody UpdateSalesHeader updateSalesHeader){
+    public ResponseEntity<?> updateSalesHeader(@PathVariable Integer id, @RequestBody UpdateSalesHeader updateSalesHeader){
         return salesHeaderService.updateSalesHeader(id, updateSalesHeader);
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteSalesHeader(@PathVariable String id){
+    public ResponseEntity<?> deleteSalesHeader(@PathVariable Integer id){
         return salesHeaderService.deleteSalesHeader(id);
     }
 }

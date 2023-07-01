@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 
 @Data
 @AllArgsConstructor
@@ -11,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class UpdatePOHDetail {
 
 
-    public String id;
+    public Integer id;
 
     public String paxName;
 
@@ -19,8 +21,8 @@ public class UpdatePOHDetail {
 
     public String description2;
 
-    public Double purchaseCost;
+    public BigDecimal purchaseCost;
 
-    public Double sellPrice;
+    public BigDecimal sellPrice;
 
 }

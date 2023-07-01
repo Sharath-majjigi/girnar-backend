@@ -5,8 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SalesHeaderDetailDAO extends JpaRepository<SalesDetail,String> {
+public interface SalesHeaderDetailDAO extends JpaRepository<SalesDetail,Integer> {
 
-    SalesDetail findByIdAndSalesHeaderId(String id, String POHId);
+    SalesDetail findByIdAndSalesHeaderId(Integer id, Integer POHId);
 
 }

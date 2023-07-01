@@ -19,12 +19,12 @@ public class POPController {
     private POPaymentService poPaymentService;
 
     @PostMapping("/{userId}/{pohId}")
-    public ResponseEntity<?> createPurchaseOrderPayment(@PathVariable String userId, @PathVariable String pohId, @RequestBody POPRequestDTO request){
+    public ResponseEntity<?> createPurchaseOrderPayment(@PathVariable String userId, @PathVariable Integer pohId, @RequestBody POPRequestDTO request){
         return poPaymentService.createPayment(userId, pohId, request);
     }
 
     @GetMapping("/{popId}")
-    public ResponseEntity<?> getPurchaseOrderPaymentsById(@PathVariable String popId){
+    public ResponseEntity<?> getPurchaseOrderPaymentsById(@PathVariable Integer popId){
         return poPaymentService.getPurchaseOrderPaymentById(popId);
     }
     @GetMapping
@@ -37,7 +37,7 @@ public class POPController {
         return poPaymentService.updatePOP(updatePOPayment);
     }
     @DeleteMapping("/{popId}")
-    public ResponseEntity<?> deletePurchaseOrderPayment(@PathVariable String popId){
+    public ResponseEntity<?> deletePurchaseOrderPayment(@PathVariable Integer popId){
         return poPaymentService.deletePurchaseOrderPaymentsById(popId);
     }
 

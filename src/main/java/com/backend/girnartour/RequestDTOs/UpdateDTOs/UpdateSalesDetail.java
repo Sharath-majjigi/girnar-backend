@@ -13,8 +13,8 @@ import javax.persistence.*;
 @NoArgsConstructor
 public class UpdateSalesDetail {
 
-    public String id;
+    public Integer id;
 
-    public String poNumber;
+    public Integer poNumber;
 
 }

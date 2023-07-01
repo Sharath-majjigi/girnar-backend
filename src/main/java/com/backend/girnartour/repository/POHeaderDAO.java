@@ -5,15 +5,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Repository
-public interface POHeaderDAO extends JpaRepository<PurchaseOrderHeader,String> {
+public interface POHeaderDAO extends JpaRepository<PurchaseOrderHeader,Integer> {
 
     @Query(value = "select sell_amount from purchase_order_header where po_number = ?1",nativeQuery = true)
-    Double findByPOHId(String id);
+    BigDecimal findByPOHId(Integer id);
 
-    List<PurchaseOrderHeader> findByIdNotIn(List<String> ids);
+    List<PurchaseOrderHeader> findByIdNotIn(List<Integer> ids);
 
 
 

@@ -15,7 +15,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 public class VendorResponseDTO {
 
-    public String id;
+    public Integer id;
 
     public String vendorName;
 

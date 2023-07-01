@@ -32,19 +32,19 @@ public class VendorController {
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getVendorById(@PathVariable String id){
+    public ResponseEntity<?> getVendorById(@PathVariable Integer id){
         return vendorService.getVendorById(id);
     }
 
     @PreAuthorize("hasRole('USER')")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateVendor(@RequestBody VendorUpdateDTO updateDTO, @PathVariable String id){
+    public ResponseEntity<?> updateVendor(@RequestBody VendorUpdateDTO updateDTO, @PathVariable Integer id){
         return vendorService.updateVendor(updateDTO,id);
     }
 
     @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteVendorById(@PathVariable String id){
+    public ResponseEntity<?> deleteVendorById(@PathVariable Integer id){
         return vendorService.deleteVendorById(id);
     }
 }

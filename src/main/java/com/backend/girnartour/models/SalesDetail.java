@@ -16,10 +16,11 @@ import java.util.List;
 public class SalesDetail {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Integer id;
 
     @Column(name = "po_number")
-    private String poNumber;
+    private Integer poNumber;
 
     @JsonIgnore
     @ManyToOne

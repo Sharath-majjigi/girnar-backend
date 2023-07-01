@@ -19,7 +19,8 @@ public class Vendor{
 
     @Id
     @Column(name = "vendor_code")
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
     @Column(name = "vendor_name")
     private String vendorName;

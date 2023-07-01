@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -12,20 +13,12 @@ import java.util.List;
 @NoArgsConstructor
 public class POPaymentRequest {
 
-//    public String poDate;
-//
-//    public String description;
-//
-//    public String remarks;
-//
-//    public List<PaymentDetail> paymentDetails;
-
     public String description;
 
     public String paymentType;
 
     public String date;
 
-    public Double amountPaid;
+    public BigDecimal amountPaid;
 
 }

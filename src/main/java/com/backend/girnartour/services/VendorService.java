@@ -31,8 +31,6 @@ public class VendorService {
     @Autowired
     private ModelMapper modelMapper;
 
-    @Autowired
-    private IdGenerationService idGenerationService;
 
     public ResponseEntity<?> addNewVendor(VendorRequestDTO requestDTO){
         //check if previously exists [By name,email,telephone]
@@ -42,18 +40,17 @@ public class VendorService {
         if(vendorDAO.existsByEmail(email) || vendorDAO.existsByVendorName(name) || vendorDAO.existsByTelephone(telephone)){
             throw new ResourceAlreadyExistsException("Vendor","Name|Telephone|Email"+name+" "+telephone+" "+email);
         }
-//        String random_sequence= String.format("%040d",new BigInteger(UUID.randomUUID().toString().replace("-",""),16));
-        String sequenceId=idGenerationService.generateUniqueId(100000,"vendor");
+//        String sequenceId=idGenerationService.generateUniqueId(100000,"vendor");
         Vendor vendor=modelMapper.map(requestDTO, Vendor.class);
-        vendor.setId(sequenceId);
+//        vendor.setId(sequenceId);
         Vendor saved=vendorDAO.save(vendor);
         VendorResponseDTO responseDTO=modelMapper.map(saved, VendorResponseDTO.class);
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
-    public ResponseEntity<?> updateVendor(VendorUpdateDTO vendorUpdateDTO,String id){
+    public ResponseEntity<?> updateVendor(VendorUpdateDTO vendorUpdateDTO,Integer id){
         Vendor existingVendor = vendorDAO.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Vendor","ID",id));
+                .orElseThrow(() -> new ResourceNotFoundException("Vendor","ID",String.valueOf(id)));
         BeanUtils.copyProperties(vendorUpdateDTO, existingVendor, getNullPropertyNames(vendorUpdateDTO));
         Vendor updatedVendor = vendorDAO.save(existingVendor);
         VendorResponseDTO responseDTO=modelMapper.map(updatedVendor, VendorResponseDTO.class);
@@ -76,23 +73,23 @@ public class VendorService {
         return ResponseEntity.ok(vendorResponseDTOS);
     }
 
-    public ResponseEntity<?> getVendorById(String id){
+    public ResponseEntity<?> getVendorById(Integer id){
         Vendor vendor;
         try{
             vendor=vendorDAO.findById(id).get();
         }catch (Exception e){
-            throw new ResourceNotFoundException("Vendor","ID",id);
+            throw new ResourceNotFoundException("Vendor","ID",String.valueOf(id));
         }
         VendorResponseDTO responseDTO=modelMapper.map(vendor,VendorResponseDTO.class);
         return ResponseEntity.ok(responseDTO);
     }
 
-    public ResponseEntity<?> deleteVendorById(String id){
+    public ResponseEntity<?> deleteVendorById(Integer id){
         Vendor vendor;
         try{
             vendor=vendorDAO.findById(id).get();
         }catch (Exception e){
-            throw new ResourceNotFoundException("Vendor","ID",id);
+            throw new ResourceNotFoundException("Vendor","ID",String.valueOf(id));
         }
         vendorDAO.delete(vendor);
         return new ResponseEntity<>("Vendor deleted Successfully with ID: "+id,HttpStatus.OK);

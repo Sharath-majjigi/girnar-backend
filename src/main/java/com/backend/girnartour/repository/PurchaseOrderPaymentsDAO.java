@@ -8,10 +8,10 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface PurchaseOrderPaymentsDAO extends JpaRepository<PurchaseOrderPayments,String> {
+public interface PurchaseOrderPaymentsDAO extends JpaRepository<PurchaseOrderPayments,Integer> {
 
-    List<PurchaseOrderPayments> findAllByPurchaseOrderHeaderId(String id);
+    List<PurchaseOrderPayments> findAllByPurchaseOrderHeaderId(Integer id);
 
     @Query(value = "select * from purchase_order_payments where po_number=?1",nativeQuery = true)
-    List<PurchaseOrderPayments> findAllPurchaseOrderPaymentsByPOHId(String id);
+    List<PurchaseOrderPayments> findAllPurchaseOrderPaymentsByPOHId(Long id);
 }

@@ -37,15 +37,6 @@ public class User {
 
     private Timestamp lastLogin;
 
-//    private String resetPasswordToken;
-
-//    @CreationTimestamp
-//    private Timestamp createdAt;
-//
-//    @UpdateTimestamp
-//    private Timestamp updatedAt;
-
-//    private String otp;
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
     private List<PurchaseOrderHeader>poh=new ArrayList<>();

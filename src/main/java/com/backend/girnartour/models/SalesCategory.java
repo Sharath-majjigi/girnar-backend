@@ -15,7 +15,7 @@ public class SalesCategory {
 
 
     @Id
-    @GeneratedValue(strategy =GenerationType.SEQUENCE)
+    @GeneratedValue(strategy =GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "sales_category")

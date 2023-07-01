@@ -4,17 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdatePOPayment {
 
-    public String id;
+    public Integer id;
 
     public String date;
 
-    public Double amountPaid;
+    public BigDecimal amountPaid;
 
     public String paymentType;
 

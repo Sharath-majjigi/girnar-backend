@@ -15,12 +15,12 @@ public class POHController {
     private POHeaderService poHeaderService;
 
     @PostMapping("/{userId}/{vendorId}")
-    public ResponseEntity<?> createPurchaseOrder(@PathVariable String userId, @PathVariable String vendorId, @RequestBody POHeaderRequest request){
+    public ResponseEntity<?> createPurchaseOrder(@PathVariable String userId, @PathVariable Integer vendorId, @RequestBody POHeaderRequest request){
         return poHeaderService.createPurchaseOrderHeader(userId, vendorId, request);
     }
 
     @GetMapping("/{pId}")
-    public ResponseEntity<?> getOrderHeaderById(@PathVariable String pId){
+    public ResponseEntity<?> getOrderHeaderById(@PathVariable Integer pId){
         return poHeaderService.getPurchaseOrderById(pId);
     }
 
@@ -33,12 +33,12 @@ public class POHController {
         return poHeaderService.getAllPurchaseOrdersNotInSalesHeader();
     }
     @PutMapping("/{id}/update")
-    public ResponseEntity<?> updatePOH(@PathVariable String id, @RequestBody UpdatePOH updatePOH){
+    public ResponseEntity<?> updatePOH(@PathVariable Integer id, @RequestBody UpdatePOH updatePOH){
         return poHeaderService.updatePOH(updatePOH, id);
     }
 
     @DeleteMapping("/{pId}")
-    public ResponseEntity<?> deleteOrderHeaderById(@PathVariable String pId){
+    public ResponseEntity<?> deleteOrderHeaderById(@PathVariable Integer pId){
         return poHeaderService.deletePurchaseOrderHeader(pId);
     }
 

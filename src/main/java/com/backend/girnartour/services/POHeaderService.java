@@ -43,21 +43,18 @@ public class POHeaderService {
     @Autowired
     private SalesHeaderDAO salesHeaderDAO;
 
-    @Autowired
-    private IdGenerationService service;
 
-    public ResponseEntity<?> createPurchaseOrderHeader(String userId, String vendorId, POHeaderRequest poHeaderRequest){
+    public ResponseEntity<?> createPurchaseOrderHeader(String userId, Integer vendorId, POHeaderRequest poHeaderRequest){
         User user=userDAO.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User","Id",userId));
-        Vendor vendor=vendorDAO.findById(vendorId).orElseThrow(() -> new ResourceNotFoundException("Vendor","Id",vendorId));
-
+        Vendor vendor=vendorDAO.findById(vendorId).orElseThrow(() -> new ResourceNotFoundException("Vendor","Id",String.valueOf(vendorId)));
         PurchaseOrderHeader poh=modelMapper.map(poHeaderRequest, PurchaseOrderHeader.class);
-        String random_sequence= service.generateUniqueId(400000,"purchaseorderheader");
-        poh.setId(random_sequence);
+//        String random_sequence= service.generateUniqueId(400000,"purchaseorderheader");
+//        poh.setId(random_sequence);
         List<PurchaseOrderDetail> orderDetails=poHeaderRequest.getPod();
-        for(PurchaseOrderDetail orderDetail:orderDetails){
-            String uuid= String.format("%040d",new BigInteger(UUID.randomUUID().toString().replace("-",""),16));
-            orderDetail.setId(uuid.substring(1,6));
-        }
+//        for(PurchaseOrderDetail orderDetail:orderDetails){
+//            String uuid= String.format("%040d",new BigInteger(UUID.randomUUID().toString().replace("-",""),16));
+//            orderDetail.setId(uuid.substring(1,6));
+//        }
 
         List<PurchaseOrderHeader> orderHeaders=user.getPoh();
         orderHeaders.add(poh);
@@ -72,7 +69,7 @@ public class POHeaderService {
             od.setPurchaseOrderHeader(poh);
             details.add(od);
         }
-        pohDetailDAO.saveAllAndFlush(details);
+
 
         poh.setPod(orderDetails);
         poh.setUser(user);
@@ -82,13 +79,14 @@ public class POHeaderService {
 //        poh.setTotalAmountPaid(poh.getTotalAmt());
 //        poh.setVendorName(vendor.getVendorName());
         PurchaseOrderHeader saved=poHeaderDAO.save(poh);
+        pohDetailDAO.saveAllAndFlush(details);
         POHeaderResponse response=modelMapper.map(saved,POHeaderResponse.class);
         return new ResponseEntity<>(response, HttpStatus.OK);
 
     }
 
-    public ResponseEntity<?> getPurchaseOrderById(String pId){
-        PurchaseOrderHeader header=poHeaderDAO.findById(pId).orElseThrow(()-> new ResourceNotFoundException("PurchaseOrderHeader","Id",pId));
+    public ResponseEntity<?> getPurchaseOrderById(Integer pId){
+        PurchaseOrderHeader header=poHeaderDAO.findById(pId).orElseThrow(()-> new ResourceNotFoundException("PurchaseOrderHeader","Id",String.valueOf(pId)));
         POHeaderResponse response=modelMapper.map(header,POHeaderResponse.class);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
@@ -103,7 +101,7 @@ public class POHeaderService {
         List<SalesHeader> salesHeaders=salesHeaderDAO.findAll();
         List<PurchaseOrderHeader> purchaseOrderHeaders;
 
-        List<String> excludedIds=new ArrayList<>();
+        List<Integer> excludedIds=new ArrayList<>();
         for(SalesHeader salesHeader:salesHeaders){
             List<SalesDetail> salesDetails=salesHeader.getSalesDetailList();
            for(SalesDetail detail:salesDetails){
@@ -119,9 +117,9 @@ public class POHeaderService {
         return new ResponseEntity<>(responses,HttpStatus.OK);
     }
 
-    public ResponseEntity<?> updatePOH(UpdatePOH updatePOH, String id){
+    public ResponseEntity<?> updatePOH(UpdatePOH updatePOH, Integer id){
         PurchaseOrderHeader poh = poHeaderDAO.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("POH","ID",id));
+                .orElseThrow(() -> new ResourceNotFoundException("POH","ID",String.valueOf(id)));
 
         List<UpdatePOHDetail> updatePOHDetails=updatePOH.getPod();
         for(int i=0; i<updatePOHDetails.size(); i++){
@@ -163,8 +161,8 @@ public class POHeaderService {
         return ResponseEntity.ok(responseDTO);
     }
 
-    public ResponseEntity deletePurchaseOrderHeader(String pId){
-        PurchaseOrderHeader header=poHeaderDAO.findById(pId).orElseThrow(()-> new ResourceNotFoundException("PurchaseOrderHeader","Id",pId));
+    public ResponseEntity deletePurchaseOrderHeader(Integer pId){
+        PurchaseOrderHeader header=poHeaderDAO.findById(pId).orElseThrow(()-> new ResourceNotFoundException("PurchaseOrderHeader","Id",String.valueOf(pId)));
         for(PurchaseOrderDetail detail:header.getPod()){
             pohDetailDAO.delete(detail);
         }

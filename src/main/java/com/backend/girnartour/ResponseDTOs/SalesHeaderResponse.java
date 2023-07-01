@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 public class SalesHeaderResponse {
 
-    public String id;
+    public Long id;
 
     public UserResponseDTO user;
 

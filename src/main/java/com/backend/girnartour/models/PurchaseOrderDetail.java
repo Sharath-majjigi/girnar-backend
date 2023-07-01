@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
@@ -15,7 +16,8 @@ import javax.persistence.*;
 public class PurchaseOrderDetail {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
     @Column(name = "pax_name")
     private String paxName;
@@ -27,10 +29,10 @@ public class PurchaseOrderDetail {
     private String description2;
 
     @Column(name = "purchase_amount")
-    private Double purchaseCost;
+    private BigDecimal purchaseCost;
 
     @Column(name = "sell_amount")
-    private Double sellPrice;
+    private BigDecimal sellPrice;
 
     @JsonIgnore
     @ManyToOne

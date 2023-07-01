@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +19,8 @@ public class PurchaseOrderPayments {
 
     @Id
     @Column(name = "payment_id")
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
     @OneToOne
     @JoinColumn(name = "po_number")
@@ -28,7 +30,7 @@ public class PurchaseOrderPayments {
     private String date;
 
     @Column(name = "amount_paid")
-    private Double amountPaid;
+    private BigDecimal amountPaid;
 
     @Column(name = "payment_type")
     private String paymentType;

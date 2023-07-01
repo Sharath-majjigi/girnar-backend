@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -17,7 +18,8 @@ public class SalesHeader {
 
     @Id
     @Column(name = "invoice_number")
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "userid")
@@ -41,27 +43,28 @@ public class SalesHeader {
     private String message;
 
     @Column(name = "invoice_amount")
-    private Double invoiceAmt;
+    private BigDecimal invoiceAmt;
 
-    private Double discount;
+    private BigDecimal discount;
 
     @Column(name = "invoice_vat")
-    private Double vatAmt;
+    private BigDecimal vatAmt;
 
     @Column(name = "invoice_total")
-    private Double totalInvoiceAmt;
+    private BigDecimal totalInvoiceAmt;
 
     @Column(name = "total_amount_paid")
-    public Double totalAmountPaid;
+    public BigDecimal totalAmountPaid;
 
     @OneToMany(mappedBy = "salesHeader",cascade = CascadeType.ALL)
     private List<SalesDetail> salesDetailList;
 
-    public Double TotalInvoiceAmount(){
-        Double ia=getInvoiceAmt();
-        Double va=getVatAmt();
-        Double da=getDiscount();
-        return ia-da+va;
+    public BigDecimal TotalInvoiceAmount(){
+        BigDecimal ia=getInvoiceAmt();
+        BigDecimal va=getVatAmt();
+        BigDecimal da=getDiscount();
+        return ia.subtract(da).add(va);
+
     }
 
 

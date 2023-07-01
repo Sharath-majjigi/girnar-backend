@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,8 @@ public class PurchaseOrderHeader {
 
     @Id
     @Column(name = "po_number")
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
     @JsonIgnore
     @ManyToOne
@@ -39,34 +41,34 @@ public class PurchaseOrderHeader {
     private String remarks;
 
     @Column(name = "po_amount")
-    private Double amount;
+    private BigDecimal amount;
 
     @Column(name = "sell_amount")
-    private Double sellAmount;
+    private BigDecimal sellAmount;
 
 
     @OneToMany(mappedBy = "purchaseOrderHeader",cascade = CascadeType.ALL)
     private List<PurchaseOrderDetail> pod=new ArrayList<>();
 
     @Column(name = "total_amount_paid")
-    public Double totalAmountPaid;
+    public BigDecimal totalAmountPaid;
 
     @Transient
-    public Double getTotalAmt(){
-        Double sum= 0D;
+    public BigDecimal getTotalAmt(){
+        BigDecimal sum = BigDecimal.ZERO;
         List<PurchaseOrderDetail> purchaseOrderDetails=getPod();
         for(PurchaseOrderDetail od:purchaseOrderDetails) {
-            sum += od.getPurchaseCost();
+            sum = sum.add(od.getPurchaseCost());
         }
         return sum;
     }
 
     @Transient
-    public Double getSellAmt(){
-        Double sum= 0D;
+    public BigDecimal getSellAmt(){
+        BigDecimal sum= BigDecimal.ZERO;
         List<PurchaseOrderDetail> purchaseOrderDetails=getPod();
         for(PurchaseOrderDetail od:purchaseOrderDetails){
-            sum+=od.getSellPrice();
+            sum= sum.add(od.getSellPrice());
         }
         return sum;
     }

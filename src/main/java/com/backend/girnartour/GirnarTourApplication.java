@@ -20,35 +20,35 @@ import java.time.Instant;
 
 @SpringBootApplication
 public class GirnarTourApplication {
-//	@Autowired
-//	private UserDAO userDAO;
-//
-//    @PostConstruct
-//    public void initUsers(){
-//        BCryptPasswordEncoder passwordEncoder=new BCryptPasswordEncoder();
-//		User dummy=User.builder()
-//				.userid("SHARATH")
-//				.userName("sharath")
-//				.active(true)
-//				.email("admin@girnar.com")
-//				.password(passwordEncoder.encode("xyz"))
-//				.role("ADMIN")
-//				.lastLogin(Timestamp.from(Instant.now()))
-//				.build();
-//		userDAO.save(dummy);
-//
-//		User dummy1=User.builder()
-//				.userid("BHARATH")
-//				.userName("bharath")
-//				.active(true)
-//				.email("user@girnar.com")
-//				.password(passwordEncoder.encode("xyz"))
-//				.role("USER")
-//				.lastLogin(Timestamp.from(Instant.now()))
-//				.build();
-//
-//        userDAO.save(dummy1);
-//    }
+	@Autowired
+	private UserDAO userDAO;
+
+    @PostConstruct
+    public void initUsers(){
+        BCryptPasswordEncoder passwordEncoder=new BCryptPasswordEncoder();
+		User dummy=User.builder()
+				.userid("SHARATH")
+				.userName("sharath")
+				.active(true)
+				.email("admin@girnar.com")
+				.password(passwordEncoder.encode("xyz"))
+				.role("ADMIN")
+				.lastLogin(Timestamp.from(Instant.now()))
+				.build();
+		userDAO.save(dummy);
+
+		User dummy1=User.builder()
+				.userid("BHARATH")
+				.userName("bharath")
+				.active(true)
+				.email("user@girnar.com")
+				.password(passwordEncoder.encode("xyz"))
+				.role("USER")
+				.lastLogin(Timestamp.from(Instant.now()))
+				.build();
+
+        userDAO.save(dummy1);
+    }
 
 	public static void main(String[] args) {
 		SpringApplication.run(GirnarTourApplication.class, args);

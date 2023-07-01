@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -17,7 +18,8 @@ public class SalesReceipts {
 
     @Id
     @Column(name = "receipt_id")
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
     @JsonIgnore
     @ManyToOne
@@ -28,7 +30,7 @@ public class SalesReceipts {
     private String date;
 
     @Column(name = "amount_received")
-    private Double amountReceived;
+    private BigDecimal amountReceived;
 
     @Column(name = "receipt_type")
     private String receiptType;

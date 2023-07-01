@@ -32,8 +32,6 @@ public class CustomerService {
     @Autowired
     private ModelMapper modelMapper;
 
-    @Autowired
-    private IdGenerationService service;
 
     public ResponseEntity<?> addNewCustomer(CustomerRequest request){
         //check if previously exists [By name,email,telephone]
@@ -43,17 +41,17 @@ public class CustomerService {
         if(customerDAO.existsByEmail(email) || customerDAO.existsByCustomerName(name) || customerDAO.existsByTelephone(telephone)){
             throw new ResourceAlreadyExistsException("Customer","Name|Telephone|Email"+name+" "+telephone+" "+email);
         }
-        String random_sequence= service.generateUniqueId(300000,"customer");
+//        String random_sequence= service.generateUniqueId(300000,"customer");
         Customer customer=modelMapper.map(request, Customer.class);
-        customer.setId(random_sequence);
+//        customer.setId(random_sequence);
         Customer saved=customerDAO.save(customer);
         CustomerResponse responseDTO=modelMapper.map(saved, CustomerResponse.class);
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
 
-    public ResponseEntity<?> updateCustomer(CustomerUpdateDTO updateDTO, String id){
+    public ResponseEntity<?> updateCustomer(CustomerUpdateDTO updateDTO, Integer id){
         Customer existingCustomer = customerDAO.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Customer","ID",id));
+                .orElseThrow(() -> new ResourceNotFoundException("Customer","ID",String.valueOf(id)));
         BeanUtils.copyProperties(updateDTO, existingCustomer, getNullPropertyNames(updateDTO));
         Customer updatedVendor = customerDAO.save(existingCustomer);
         VendorResponseDTO responseDTO=modelMapper.map(updatedVendor, VendorResponseDTO.class);
@@ -76,23 +74,23 @@ public class CustomerService {
         return ResponseEntity.ok(customerResponses);
     }
 
-    public ResponseEntity<?> getCustomerById(String id){
+    public ResponseEntity<?> getCustomerById(Integer id){
         Customer customer;
         try{
             customer=customerDAO.findById(id).get();
         }catch (Exception e){
-            throw new ResourceNotFoundException("Customer","ID",id);
+            throw new ResourceNotFoundException("Customer","ID",String.valueOf(id));
         }
         CustomerResponse responseDTO=modelMapper.map(customer,CustomerResponse.class);
         return ResponseEntity.ok(responseDTO);
     }
 
-    public ResponseEntity<?> deleteCustomerById(String id){
+    public ResponseEntity<?> deleteCustomerById(Integer id){
         Customer customer;
         try{
             customer=customerDAO.findById(id).get();
         }catch (Exception e){
-            throw new ResourceNotFoundException("Customer","ID",id);
+            throw new ResourceNotFoundException("Customer","ID",String.valueOf(id));
         }
         customerDAO.delete(customer);
         return new ResponseEntity<>("Customer deleted Successfully with ID: "+id,HttpStatus.OK);

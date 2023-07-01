@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 public class CustomerResponse {
 
-    public String id;
+    public Integer id;
 
     public String customerName;
 

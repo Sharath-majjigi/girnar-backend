@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface PohDetailDAO extends JpaRepository<PurchaseOrderDetail,String> {
+public interface PohDetailDAO extends JpaRepository<PurchaseOrderDetail,Integer> {
 
-    PurchaseOrderDetail findByIdAndPurchaseOrderHeaderId(String id,String pohId);
+    PurchaseOrderDetail findByIdAndPurchaseOrderHeaderId(Integer id,Integer pohId);
 }

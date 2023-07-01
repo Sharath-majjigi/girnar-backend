@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Column;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -19,34 +20,14 @@ import java.util.List;
 @NoArgsConstructor
 public class POPaymentResponse {
 
-//    public String id;
 
-//    public String poDate;
-//
-//    public String description;
-//
-//    public String remarks;
-//
-//    public Double amount;
-//
-//    public Double totalPaid;
-//
-//    public String vendorName;
-//
-//    public UserResponseDTO user;
-//
-//    public VendorResponseDTO vendor;
-//
-//    public List<PaymentDetail> paymentDetails;
-
-
-    public String id;
+    public Integer id;
 
     public POHeaderResponse purchaseOrderHeader;
 
     public String date;
 
-    public Double amountPaid;
+    public BigDecimal amountPaid;
 
     public String paymentType;
 

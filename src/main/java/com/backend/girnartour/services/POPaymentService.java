@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.beans.FeatureDescriptor;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,21 +47,19 @@ public class POPaymentService {
     @Autowired
     private VendorDAO vendorDAO;
 
-    @Autowired
-    private IdGenerationService service;
 
 
-    public ResponseEntity<?> createPayment(String userId, String pohId, POPRequestDTO paymentRequest){
+    public ResponseEntity<?> createPayment(String userId, Integer pohId, POPRequestDTO paymentRequest){
         User user=userDAO.findById(userId).orElseThrow(() ->new ResourceNotFoundException("User","Id",userId));
-        PurchaseOrderHeader poh=poHeaderDAO.findById(pohId).orElseThrow(() ->new ResourceNotFoundException("POH","Id",pohId));
+        PurchaseOrderHeader poh=poHeaderDAO.findById(pohId).orElseThrow(() ->new ResourceNotFoundException("POH","Id",String.valueOf(pohId)));
 //        Vendor vendor=vendorDAO.findById(vendorId).orElseThrow(() ->new ResourceNotFoundException("Vendor","Id",vendorId));
-        Double totalAmountPaid=0.0;
+        BigDecimal totalAmountPaid=BigDecimal.ZERO;
         List<POPaymentRequest> paymentRequests=paymentRequest.getRequests();
         for(POPaymentRequest request:paymentRequests){
             PurchaseOrderPayments pop=new PurchaseOrderPayments();
-            String uuid= service.generateUniqueId(500000,"purchaseorderpayment");
-            pop.setId(uuid);
-            totalAmountPaid = totalAmountPaid + request.getAmountPaid();
+//            String uuid= service.generateUniqueId(500000,"purchaseorderpayment");
+//            pop.setId(uuid);
+            totalAmountPaid = totalAmountPaid.add(request.getAmountPaid());
             pop.setPurchaseOrderHeader(poh);
             pop.setDate(request.getDate());
             pop.setAmountPaid(request.getAmountPaid());
@@ -70,8 +69,8 @@ public class POPaymentService {
             paymentsDAO.save(pop);
         }
 
-        Double total= (poh.getTotalAmountPaid()!=null ? poh.getTotalAmountPaid() : 0.0);
-        poh.setTotalAmountPaid(totalAmountPaid+total);
+        BigDecimal total= (poh.getTotalAmountPaid()!=null ? poh.getTotalAmountPaid() : BigDecimal.ZERO);
+        poh.setTotalAmountPaid(totalAmountPaid.add(total));
         poHeaderDAO.save(poh);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -81,8 +80,8 @@ public class POPaymentService {
         return new ResponseEntity<>(responses,HttpStatus.OK);
     }
 
-    public ResponseEntity<?> getPurchaseOrderPaymentById(String popId){
-        PurchaseOrderPayments payments=paymentsDAO.findById(popId).orElseThrow(()-> new ResourceNotFoundException("PurchaseOrderPayment","Id",popId));
+    public ResponseEntity<?> getPurchaseOrderPaymentById(Integer popId){
+        PurchaseOrderPayments payments=paymentsDAO.findById(popId).orElseThrow(()-> new ResourceNotFoundException("PurchaseOrderPayment","Id",String.valueOf(popId)));
         POPaymentResponse response=modelMapper.map(payments,POPaymentResponse.class);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
@@ -91,7 +90,7 @@ public class POPaymentService {
         for(int i=0; i<updateDTOs.size(); i++){
             UpdatePOPayment updatePOPayment=updateDTOs.get(i);
             PurchaseOrderPayments existingPOP = paymentsDAO.findById(updatePOPayment.getId())
-                    .orElseThrow(() -> new ResourceNotFoundException("POP","ID",updatePOPayment.getId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("POP","ID",String.valueOf(updatePOPayment.getId())));
             BeanUtils.copyProperties(updatePOPayment, existingPOP, getNullPropertyNames(updatePOPayment));
             paymentsDAO.save(existingPOP);
         }
@@ -105,8 +104,8 @@ public class POPaymentService {
                 .toArray(String[]::new);
     }
 
-    public ResponseEntity deletePurchaseOrderPaymentsById(String popId){
-        PurchaseOrderPayments payments=paymentsDAO.findById(popId).orElseThrow(()-> new ResourceNotFoundException("PurchaseOrderPayment","Id",popId));
+    public ResponseEntity deletePurchaseOrderPaymentsById(Integer popId){
+        PurchaseOrderPayments payments=paymentsDAO.findById(popId).orElseThrow(()-> new ResourceNotFoundException("PurchaseOrderPayment","Id",String.valueOf(popId)));
         paymentsDAO.delete(payments);
         return new ResponseEntity<>("PurchaseOrderPayment deleted Successfully !",HttpStatus.OK);
     }

@@ -31,19 +31,19 @@ public class CustomerController {
 
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/{id}")
-    public ResponseEntity<?> getCustomerById(@PathVariable String id){
+    public ResponseEntity<?> getCustomerById(@PathVariable Integer id){
         return customerService.getCustomerById(id);
     }
 
     @PreAuthorize("hasRole('USER')")
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateCustomer(@RequestBody CustomerUpdateDTO updateDTO, @PathVariable String id){
+    public ResponseEntity<?> updateCustomer(@RequestBody CustomerUpdateDTO updateDTO, @PathVariable Integer id){
         return customerService.updateCustomer(updateDTO,id);
     }
 
     @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCustomerById(@PathVariable String id){
+    public ResponseEntity<?> deleteCustomerById(@PathVariable Integer id){
         return customerService.deleteCustomerById(id);
     }
 

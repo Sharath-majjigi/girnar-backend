@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CustomerDAO extends JpaRepository<Customer,String> {
+public interface CustomerDAO extends JpaRepository<Customer, Integer> {
     boolean existsByEmail(String email);
 
     boolean existsByCustomerName(String name);

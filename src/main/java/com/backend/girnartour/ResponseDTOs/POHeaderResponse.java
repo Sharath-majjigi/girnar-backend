@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,16 +18,16 @@ import java.util.List;
 public class POHeaderResponse {
 
 
-    public String id;
+    public Integer id;
 
     public String poDate;
 
     public String description;
 
     public String remarks;
-    public Double amount;
+    public BigDecimal amount;
 
-    public Double sellAmount;
+    public BigDecimal sellAmount;
 
 
     public String vendorName;
@@ -37,6 +38,6 @@ public class POHeaderResponse {
 
     public List<PurchaseOrderDetail> pod;
 
-    public Double totalAmountPaid;
+    public BigDecimal totalAmountPaid;
 
 }

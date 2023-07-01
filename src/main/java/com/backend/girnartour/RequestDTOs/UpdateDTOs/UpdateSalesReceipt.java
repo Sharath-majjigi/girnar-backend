@@ -4,17 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateSalesReceipt {
 
-    public String id;
+    public Integer id;
 
     public String date;
 
-    public Double amountReceived;
+    public BigDecimal amountReceived;
 
     public String receiptType;
 

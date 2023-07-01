@@ -7,18 +7,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class SalesReceiptResponse {
 
-    private String id;
+    private Integer id;
 
     private SalesHeaderResponse salesHeader;
 
     private String date;
 
-    private Double amountReceived;
+    private BigDecimal amountReceived;
 
     private String receiptType;
 

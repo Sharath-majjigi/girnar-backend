@@ -53,12 +53,11 @@ public class UserService {
     @Autowired
     private JwtTokenHelper jwtTokenHelper;
 
-    @Autowired
-    private IdGenerationService service;
+
 
     public UserResponseDTO saveNewUser(UserRequestDTO userRequestDTO){
         User saveUser=modelMapper.map(userRequestDTO,User.class);
-        String random_sequence= String.format("%040d",new BigInteger(UUID.randomUUID().toString().replace("-",""),16));
+//        String random_sequence= String.format("%040d",new BigInteger(UUID.randomUUID().toString().replace("-",""),16));
         if(userRequestDTO.getRole()==null){
             saveUser.setRole(UserConstants.DEFAULT_ROLE);
         }

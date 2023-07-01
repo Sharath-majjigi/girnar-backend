@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -20,13 +21,13 @@ public class UpdateSalesHeader {
 
     public String message;
 
-    public Double discount;
+    public BigDecimal discount;
 
-    public Double vatAmt;
+    public BigDecimal vatAmt;
 
-    public Double invoiceAmt;
+    public BigDecimal invoiceAmt;
 
-    public Double totalInvoiceAmt;
+    public BigDecimal totalInvoiceAmt;
 
     public List<UpdateSalesDetail> salesDetailList;
 

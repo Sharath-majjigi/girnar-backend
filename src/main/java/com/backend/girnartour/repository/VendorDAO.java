@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface VendorDAO extends JpaRepository<Vendor,String> {
+public interface VendorDAO extends JpaRepository<Vendor,Integer> {
 
     boolean existsByEmail(String email);
 
