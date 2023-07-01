@@ -32,7 +32,6 @@ public class PaymentTypeService {
     public ResponseEntity<?> createNewPaymentType(PaymentTypeRequest paymentTypeRequest){
         String random_sequence= String.format("%040d",new BigInteger(UUID.randomUUID().toString().replace("-",""),16));
         PaymentType toSave=modelMapper.map(paymentTypeRequest, PaymentType.class);
-        toSave.setId(random_sequence.substring(1,3));
        PaymentType saved=paymentTypeDAO.save(toSave);
        return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
@@ -41,19 +40,19 @@ public class PaymentTypeService {
         return new ResponseEntity<>(paymentTypeDAO.findAll(),HttpStatus.OK);
     }
 
-    public ResponseEntity<?> deletePaymentType(String type){
+    public ResponseEntity<?> deletePaymentType(Integer type){
         PaymentType paymentType;
         try{
             paymentType=paymentTypeDAO.findById(type).get();
         }catch (Exception e){
-            throw new ResourceNotFoundException("PaymentType","Type",type);
+            throw new ResourceNotFoundException("PaymentType","Type",String.valueOf(type));
         }
         paymentTypeDAO.delete(paymentType);
         return new ResponseEntity<>("Deleted SuccessFully",HttpStatus.OK);
     }
 
-    public ResponseEntity<?> updatePaymentType(String id,UpdatePaymentType updatePaymentType){
-        PaymentType paymentType=paymentTypeDAO.findById(id).orElseThrow(() -> new ResourceNotFoundException("PaymentType","Id",id));
+    public ResponseEntity<?> updatePaymentType(Integer id,UpdatePaymentType updatePaymentType){
+        PaymentType paymentType=paymentTypeDAO.findById(id).orElseThrow(() -> new ResourceNotFoundException("PaymentType","Id",String.valueOf(id)));
         if(updatePaymentType.getDescription()!=null || !updatePaymentType.getDescription().isEmpty()){
             paymentType.setDescription(updatePaymentType.getDescription());
         }
@@ -64,8 +63,8 @@ public class PaymentTypeService {
         return new ResponseEntity<>(updated,HttpStatus.OK);
     }
 
-    public ResponseEntity<?> updatePaymentType(UpdatePaymentType updatePaymentType, String id){
-        PaymentType paymentType=paymentTypeDAO.findById(id).orElseThrow(() -> new ResourceNotFoundException("PaymentType","Id",id));
+    public ResponseEntity<?> updatePaymentType(UpdatePaymentType updatePaymentType, Integer id){
+        PaymentType paymentType=paymentTypeDAO.findById(id).orElseThrow(() -> new ResourceNotFoundException("PaymentType","Id",String.valueOf(id)));
         BeanUtils.copyProperties(updatePaymentType, paymentType, getNullPropertyNames(updatePaymentType));
         PaymentType updatedPaymentType = paymentTypeDAO.save(paymentType);
         return ResponseEntity.ok(updatedPaymentType);

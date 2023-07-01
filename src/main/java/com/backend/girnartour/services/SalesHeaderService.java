@@ -73,21 +73,19 @@ public class SalesHeaderService {
 
         List<SalesDetail> salesDetails=salesHeaderRequest.getSalesDetailList();
 
-        List<SalesHeader> salesHeaders=user.getSalesEntries();
-        salesHeaders.add(salesHeader);
-        userDAO.save(user);
-
-        List<SalesHeader> salesHeaders1=customer.getSalesHeaderList();
-        salesHeaders1.add(salesHeader);
-        customerDAO.save(customer);
+//        List<SalesHeader> salesHeaders=user.getSalesEntries();
+//        salesHeaders.add(salesHeader);
+//        userDAO.save(user);
+//
+//        List<SalesHeader> salesHeaders1=customer.getSalesHeaderList();
+//        salesHeaders1.add(salesHeader);
+//        customerDAO.save(customer);
 
         List<SalesDetail> details=new ArrayList<>();
         for(SalesDetail sd:salesDetails){
             sd.setSalesHeader(salesHeader);
             details.add(sd);
         }
-
-
 
         salesHeader.setSalesDetailList(salesHeaderRequest.getSalesDetailList());
         SalesHeader saved=salesHeaderDAO.save(salesHeader);

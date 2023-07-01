@@ -28,12 +28,12 @@ public class PaymentTypeController {
 
 
     @DeleteMapping("/{type}")
-    public ResponseEntity<?> deletePaymentType(@PathVariable String type){
+    public ResponseEntity<?> deletePaymentType(@PathVariable Integer type){
         return paymentTypeService.deletePaymentType(type);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updatePaymentType(@PathVariable String id, @RequestBody UpdatePaymentType updatePaymentType){
+    public ResponseEntity<?> updatePaymentType(@PathVariable Integer id, @RequestBody UpdatePaymentType updatePaymentType){
         return paymentTypeService.updatePaymentType(id, updatePaymentType);
     }
 

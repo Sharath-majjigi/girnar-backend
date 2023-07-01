@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,25 +45,24 @@ public class POHeaderService {
     private SalesHeaderDAO salesHeaderDAO;
 
 
+    @Transactional
     public ResponseEntity<?> createPurchaseOrderHeader(String userId, Integer vendorId, POHeaderRequest poHeaderRequest){
         User user=userDAO.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User","Id",userId));
         Vendor vendor=vendorDAO.findById(vendorId).orElseThrow(() -> new ResourceNotFoundException("Vendor","Id",String.valueOf(vendorId)));
         PurchaseOrderHeader poh=modelMapper.map(poHeaderRequest, PurchaseOrderHeader.class);
-//        String random_sequence= service.generateUniqueId(400000,"purchaseorderheader");
-//        poh.setId(random_sequence);
         List<PurchaseOrderDetail> orderDetails=poHeaderRequest.getPod();
 //        for(PurchaseOrderDetail orderDetail:orderDetails){
 //            String uuid= String.format("%040d",new BigInteger(UUID.randomUUID().toString().replace("-",""),16));
 //            orderDetail.setId(uuid.substring(1,6));
 //        }
 
-        List<PurchaseOrderHeader> orderHeaders=user.getPoh();
-        orderHeaders.add(poh);
-        userDAO.save(user);
+//        List<PurchaseOrderHeader> orderHeaders=user.getPoh();
+//        orderHeaders.add(poh);
+//        userDAO.save(user);
 
-        List<PurchaseOrderHeader> vendorOrderHeaders=vendor.getPoh();
-        vendorOrderHeaders.add(poh);
-        vendorDAO.save(vendor);
+//        List<PurchaseOrderHeader> vendorOrderHeaders=vendor.getPoh();
+//        vendorOrderHeaders.add(poh);
+//        vendorDAO.save(vendor);
 
         List<PurchaseOrderDetail> details=new ArrayList<>();
         for(PurchaseOrderDetail od:orderDetails){
@@ -78,7 +78,9 @@ public class POHeaderService {
         poh.setSellAmount(poh.getSellAmt());
 //        poh.setTotalAmountPaid(poh.getTotalAmt());
 //        poh.setVendorName(vendor.getVendorName());
+
         PurchaseOrderHeader saved=poHeaderDAO.save(poh);
+        System.out.println("Purchase order Header "+saved.getId());
         pohDetailDAO.saveAllAndFlush(details);
         POHeaderResponse response=modelMapper.map(saved,POHeaderResponse.class);
         return new ResponseEntity<>(response, HttpStatus.OK);
