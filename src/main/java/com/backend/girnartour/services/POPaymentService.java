@@ -1,5 +1,6 @@
 package com.backend.girnartour.services;
 
+import com.backend.girnartour.RequestDTOs.POHeaderRequest;
 import com.backend.girnartour.RequestDTOs.POPRequestDTO;
 import com.backend.girnartour.RequestDTOs.POPaymentRequest;
 import com.backend.girnartour.RequestDTOs.UpdateDTOs.CustomerUpdateDTO;
@@ -22,6 +23,12 @@ import org.springframework.stereotype.Service;
 import java.beans.FeatureDescriptor;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -61,7 +68,9 @@ public class POPaymentService {
 //            pop.setId(uuid);
             totalAmountPaid = totalAmountPaid.add(request.getAmountPaid());
             pop.setPurchaseOrderHeader(poh);
-            pop.setDate(request.getDate());
+
+            Timestamp timestamp = getTimestamp(request);
+            pop.setDate(timestamp);
             pop.setAmountPaid(request.getAmountPaid());
             pop.setPaymentType(request.getPaymentType());
             pop.setDescription(request.getDescription());
@@ -73,6 +82,17 @@ public class POPaymentService {
         poh.setTotalAmountPaid(totalAmountPaid.add(total));
         poHeaderDAO.save(poh);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+    private static Timestamp getTimestamp(POPaymentRequest poPaymentRequest) {
+        String dateString = poPaymentRequest.getDate();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(dateString, dateFormatter);
+
+        LocalTime currentTime = LocalTime.now(ZoneId.of("Asia/Jakarta")); // Get the current time
+        LocalDateTime localDateTime = LocalDateTime.of(localDate, currentTime);
+
+        Timestamp timestamp = Timestamp.valueOf(localDateTime);
+        return timestamp;
     }
     public ResponseEntity<?> getAllPurchaseOrderPayments(){
         List<PurchaseOrderPayments> orderPayments=paymentsDAO.findAll();
@@ -92,9 +112,20 @@ public class POPaymentService {
             PurchaseOrderPayments existingPOP = paymentsDAO.findById(updatePOPayment.getId())
                     .orElseThrow(() -> new ResourceNotFoundException("POP","ID",String.valueOf(updatePOPayment.getId())));
             BeanUtils.copyProperties(updatePOPayment, existingPOP, getNullPropertyNames(updatePOPayment));
+            if(existingPOP.getDate()!=null){
+                String dateString = updatePOPayment.getDate();
+                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                LocalDate localDate = LocalDate.parse(dateString, dateFormatter);
+
+                LocalTime currentTime = LocalTime.now(ZoneId.of("Asia/Jakarta")); // Get the current time
+                LocalDateTime localDateTime = LocalDateTime.of(localDate, currentTime);
+
+                Timestamp timestamp = Timestamp.valueOf(localDateTime);
+                existingPOP.setDate(timestamp);
+            }
             paymentsDAO.save(existingPOP);
         }
-        return new ResponseEntity<>("Updated !",HttpStatus.OK);
+        return new ResponseEntity<>("Updated PurchaseOrderPayment!",HttpStatus.OK);
     }
     private static String[] getNullPropertyNames(Object source) {
         BeanWrapperImpl src = new BeanWrapperImpl(source);

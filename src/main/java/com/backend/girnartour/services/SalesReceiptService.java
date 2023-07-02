@@ -23,6 +23,13 @@ import org.springframework.stereotype.Service;
 import java.beans.FeatureDescriptor;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -53,11 +60,10 @@ public class SalesReceiptService {
         List<SalesReceiptRequest> salesReceiptRequestList=salesReceiptDTO.getRequests();
         for(SalesReceiptRequest request:salesReceiptRequestList){
             SalesReceipts salesReceipts=new SalesReceipts();
-//            String uuid= service.generateUniqueId(600000,"salesreceipt");
-//            salesReceipts.setId(uuid);
             totalAmountPaid=totalAmountPaid.add(request.getAmountReceived());
             salesReceipts.setSalesHeader(sh);
-            salesReceipts.setDate(request.getDate());
+            Timestamp timestamp=getTimeStamp(request);
+            salesReceipts.setDate(timestamp);
             salesReceipts.setAmountReceived(request.getAmountReceived());
             salesReceipts.setReceiptType(request.getReceiptType());
             salesReceipts.setDescription(request.getDescription());
@@ -68,6 +74,18 @@ public class SalesReceiptService {
         sh.setTotalAmountPaid(totalAmountPaid.add(total));
         salesHeaderDAO.save(sh);
         return new ResponseEntity<>("Successfully Created",HttpStatus.CREATED);
+    }
+
+    private Timestamp getTimeStamp(SalesReceiptRequest request) {
+        String dateString = request.getDate();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(dateString, dateFormatter);
+
+        LocalTime currentTime = LocalTime.now(ZoneId.of("Asia/Jakarta")); // Get the current time
+        LocalDateTime localDateTime = LocalDateTime.of(localDate, currentTime);
+
+        Timestamp timestamp = Timestamp.valueOf(localDateTime);
+        return timestamp;
     }
 
     public ResponseEntity<?> getAllSalesReceipt() {
@@ -89,6 +107,17 @@ public class SalesReceiptService {
             SalesReceipts existingSalesReceipt = salesReceiptDAO.findById(updateSalesReceipt.getId())
                     .orElseThrow(() -> new ResourceNotFoundException("SalesReceipt","ID",String.valueOf(updateSalesReceipt.getId())));
             BeanUtils.copyProperties(updateSalesReceipt, existingSalesReceipt, getNullPropertyNames(updateSalesReceipt));
+            if(updateSalesReceipt.getDate()!=null){
+                String dateString = updateSalesReceipt.getDate();
+                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                LocalDate localDate = LocalDate.parse(dateString, dateFormatter);
+
+                LocalTime currentTime = LocalTime.now(ZoneId.of("Asia/Jakarta")); // Get the current time
+                LocalDateTime localDateTime = LocalDateTime.of(localDate, currentTime);
+
+                Timestamp timestamp = Timestamp.valueOf(localDateTime);
+                existingSalesReceipt.setDate(timestamp);
+            }
             salesReceiptDAO.save(existingSalesReceipt);
         }
        return new ResponseEntity<>("Successfully updated !",HttpStatus.OK);

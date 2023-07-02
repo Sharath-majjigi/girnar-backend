@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.List;
+import java.sql.Timestamp;
 
 @Data
 @AllArgsConstructor
@@ -26,8 +26,8 @@ public class SalesReceipts {
     @JoinColumn(name = "invoice_number")
     private SalesHeader salesHeader;
 
-    @Column(name = "date_received")
-    private String date;
+    @Column(name = "date_received",columnDefinition = "TIMESTAMP")
+    private Timestamp date;
 
     @Column(name = "amount_received")
     private BigDecimal amountReceived;
@@ -41,23 +41,5 @@ public class SalesReceipts {
     @ManyToOne
     @JoinColumn(name = "userid")
     private User user;
-
-//    @ManyToOne
-//    private Customer customer;
-
-    // private Double totalPaid;
-
-//    @OneToMany(mappedBy = "salesReceipts",cascade = CascadeType.ALL)
-//    private List<SalesReceiptDetail> salesDetails;
-
-
-//    @Transient
-//    public Double totalPaidAmount(){
-//        Double sum=0D;
-//        for(SalesReceiptDetail sa:salesDetails){
-//            sum+=sa.getAmountReceived();
-//        }
-//        return sum;
-//    }
 
 }

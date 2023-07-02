@@ -15,6 +15,9 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -45,16 +48,18 @@ public class POHeaderService {
     private SalesHeaderDAO salesHeaderDAO;
 
 
+
     @Transactional
     public ResponseEntity<?> createPurchaseOrderHeader(String userId, Integer vendorId, POHeaderRequest poHeaderRequest){
         User user=userDAO.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User","Id",userId));
         Vendor vendor=vendorDAO.findById(vendorId).orElseThrow(() -> new ResourceNotFoundException("Vendor","Id",String.valueOf(vendorId)));
-        PurchaseOrderHeader poh=modelMapper.map(poHeaderRequest, PurchaseOrderHeader.class);
+//        PurchaseOrderHeader poh=modelMapper.map(poHeaderRequest, PurchaseOrderHeader.class);
+        PurchaseOrderHeader poh=new PurchaseOrderHeader();
+        poh.setDescription(poHeaderRequest.getDescription());
+        poh.setRemarks(poHeaderRequest.getRemarks());
+        poh.setPod(poHeaderRequest.getPod());
+
         List<PurchaseOrderDetail> orderDetails=poHeaderRequest.getPod();
-//        for(PurchaseOrderDetail orderDetail:orderDetails){
-//            String uuid= String.format("%040d",new BigInteger(UUID.randomUUID().toString().replace("-",""),16));
-//            orderDetail.setId(uuid.substring(1,6));
-//        }
 
 //        List<PurchaseOrderHeader> orderHeaders=user.getPoh();
 //        orderHeaders.add(poh);
@@ -76,21 +81,41 @@ public class POHeaderService {
         poh.setVendor(vendor);
         poh.setAmount(poh.getTotalAmt());
         poh.setSellAmount(poh.getSellAmt());
-//        poh.setTotalAmountPaid(poh.getTotalAmt());
-//        poh.setVendorName(vendor.getVendorName());
+
+        Timestamp timestamp = getTimestamp(poHeaderRequest);
+        poh.setPoDate(timestamp);
 
         PurchaseOrderHeader saved=poHeaderDAO.save(poh);
-        System.out.println("Purchase order Header "+saved.getId());
         pohDetailDAO.saveAllAndFlush(details);
-        POHeaderResponse response=modelMapper.map(saved,POHeaderResponse.class);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>("POH saved with ID: "+saved.getId(), HttpStatus.OK);
 
+    }
+
+    private static Timestamp getTimestamp(POHeaderRequest poHeaderRequest) {
+        String dateString = poHeaderRequest.getPoDate();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(dateString, dateFormatter);
+
+        LocalTime currentTime = LocalTime.now(ZoneId.of("Asia/Jakarta")); // Get the current time
+        LocalDateTime localDateTime = LocalDateTime.of(localDate, currentTime);
+
+        Timestamp timestamp = Timestamp.valueOf(localDateTime);
+        return timestamp;
     }
 
     public ResponseEntity<?> getPurchaseOrderById(Integer pId){
         PurchaseOrderHeader header=poHeaderDAO.findById(pId).orElseThrow(()-> new ResourceNotFoundException("PurchaseOrderHeader","Id",String.valueOf(pId)));
         POHeaderResponse response=modelMapper.map(header,POHeaderResponse.class);
+//        String dateString = getDateString(header);
+//        response.setPoDate(dateString);
         return new ResponseEntity<>(response,HttpStatus.OK);
+    }
+
+    private static String getDateString(PurchaseOrderHeader header) {
+        LocalDateTime localDateTime = header.getPoDate().toLocalDateTime();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String dateString = localDateTime.format(dateFormatter);
+        return dateString;
     }
 
     public ResponseEntity<?> getAllPurchaseOrders(){
@@ -124,31 +149,42 @@ public class POHeaderService {
                 .orElseThrow(() -> new ResourceNotFoundException("POH","ID",String.valueOf(id)));
 
         List<UpdatePOHDetail> updatePOHDetails=updatePOH.getPod();
-        for(int i=0; i<updatePOHDetails.size(); i++){
-            UpdatePOHDetail updatePOHDetail=updatePOHDetails.get(i);
-            PurchaseOrderDetail detail=pohDetailDAO.findByIdAndPurchaseOrderHeaderId(updatePOHDetail.getId(),id);
+        if(updatePOH.getPod()!=null){
 
-            if(updatePOHDetail.getPaxName()!=null){
-                detail.setPaxName(updatePOHDetail.getPaxName());
-            }
-            if(updatePOHDetail.getDescription1()!=null){
-                detail.setDescription1(updatePOHDetail.getDescription1());
-            }
-            if(updatePOHDetail.getDescription2()!=null){
-                detail.setDescription2(updatePOHDetail.getDescription2());
-            }
-            if(updatePOHDetail.getSellPrice()!=null){
-                detail.setSellPrice(updatePOHDetail.getSellPrice());
-            }
-            if(updatePOHDetail.getPurchaseCost()!=null){
-                detail.setPurchaseCost(updatePOHDetail.getPurchaseCost());
-            }
+            for(int i=0; i<updatePOHDetails.size(); i++){
+                UpdatePOHDetail updatePOHDetail=updatePOHDetails.get(i);
+                PurchaseOrderDetail detail=pohDetailDAO.findByIdAndPurchaseOrderHeaderId(updatePOHDetail.getId(),id);
 
-            pohDetailDAO.save(detail);
+                if(updatePOHDetail.getPaxName()!=null){
+                    detail.setPaxName(updatePOHDetail.getPaxName());
+                }
+                if(updatePOHDetail.getDescription1()!=null){
+                    detail.setDescription1(updatePOHDetail.getDescription1());
+                }
+                if(updatePOHDetail.getDescription2()!=null){
+                    detail.setDescription2(updatePOHDetail.getDescription2());
+                }
+                if(updatePOHDetail.getSellPrice()!=null){
+                    detail.setSellPrice(updatePOHDetail.getSellPrice());
+                }
+                if(updatePOHDetail.getPurchaseCost()!=null){
+                    detail.setPurchaseCost(updatePOHDetail.getPurchaseCost());
+                }
+
+                pohDetailDAO.save(detail);
+            }
         }
 
         if(updatePOH.getPoDate()!=null){
-            poh.setPoDate(updatePOH.getPoDate());
+            String dateString = updatePOH.getPoDate();
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate localDate = LocalDate.parse(dateString, dateFormatter);
+
+            LocalTime currentTime = LocalTime.now(ZoneId.of("Asia/Jakarta")); // Get the current time
+            LocalDateTime localDateTime = LocalDateTime.of(localDate, currentTime);
+
+            Timestamp timestamp = Timestamp.valueOf(localDateTime);
+            poh.setPoDate(timestamp);
         }
         if(updatePOH.getDescription()!=null){
             poh.setDescription(updatePOH.getDescription());

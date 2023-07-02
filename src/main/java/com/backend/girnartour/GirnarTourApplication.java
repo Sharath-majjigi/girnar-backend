@@ -3,6 +3,8 @@ package com.backend.girnartour;
 import com.backend.girnartour.models.User;
 import com.backend.girnartour.repository.UserDAO;
 import com.backend.girnartour.services.UserService;
+import org.modelmapper.AbstractConverter;
+import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,8 +17,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import javax.annotation.PostConstruct;
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @SpringBootApplication
 public class GirnarTourApplication {
@@ -57,22 +63,18 @@ public class GirnarTourApplication {
 	@Bean
 	public ModelMapper modelMapper(){
 		ModelMapper modelMapper = new ModelMapper();
+		modelMapper.addConverter(timestampToStringConverter);
 		modelMapper.getConfiguration()
 				.setMatchingStrategy(MatchingStrategies.STRICT);
 		return modelMapper;
 	}
 
-//	@Bean
-//	public WebMvcConfigurer corsConfigurer() {
-//		return new WebMvcConfigurerAdapter() {
-//			@Override
-//			public void addCorsMappings(CorsRegistry registry) {
-//				registry.addMapping("/**")
-//						.allowedOrigins("*")
-//						.allowedHeaders("*")
-//						.allowedMethods("*");
-//			}
-//		};
-//	}
+	Converter<Timestamp, String> timestampToStringConverter = new AbstractConverter<>() {
+		protected String convert(Timestamp source) {
+			LocalDateTime localDateTime = source.toLocalDateTime();
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			return localDateTime.format(formatter);
+		}
+	};
 
 }

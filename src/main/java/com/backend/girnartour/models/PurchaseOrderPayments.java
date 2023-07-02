@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,8 +27,8 @@ public class PurchaseOrderPayments {
     @JoinColumn(name = "po_number")
     private PurchaseOrderHeader purchaseOrderHeader;
 
-    @Column(name = "date_paid")
-    private String date;
+    @Column(name = "date_paid",columnDefinition = "TIMESTAMP")
+    private Timestamp date;
 
     @Column(name = "amount_paid")
     private BigDecimal amountPaid;

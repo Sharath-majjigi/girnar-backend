@@ -2,12 +2,12 @@ package com.backend.girnartour.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,8 +28,8 @@ public class PurchaseOrderHeader {
     @JoinColumn(name = "userid")
     private User user;
 
-    @Column(name = "po_date")
-    private String poDate;
+    @Column(name = "po_date",columnDefinition = "TIMESTAMP")
+    private Timestamp poDate;
 
     @JsonIgnore
     @ManyToOne

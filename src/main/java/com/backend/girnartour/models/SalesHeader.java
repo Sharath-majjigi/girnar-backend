@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Data
@@ -25,8 +26,8 @@ public class SalesHeader {
     @JoinColumn(name = "userid")
     private User user;
 
-    @Column(name = "invoice_date")
-    private String date;
+    @Column(name = "invoice_date",columnDefinition = "TIMESTAMP")
+    private Timestamp date;
 
 
     @Column(name = "sales_category")
@@ -50,11 +51,20 @@ public class SalesHeader {
     @Column(name = "invoice_vat")
     private BigDecimal vatAmt;
 
+    @Column(name = "vat_percent")
+    private Integer vatPercent;
+
     @Column(name = "invoice_total")
     private BigDecimal totalInvoiceAmt;
 
     @Column(name = "total_amount_paid")
     public BigDecimal totalAmountPaid;
+
+    @Column(name = "sales_commission")
+    public BigDecimal salesCommission;
+
+    @Column(name = "loyalty_points_earned")
+    public Integer loyaltyPointsEarned;
 
     @OneToMany(mappedBy = "salesHeader",cascade = CascadeType.ALL)
     private List<SalesDetail> salesDetailList;

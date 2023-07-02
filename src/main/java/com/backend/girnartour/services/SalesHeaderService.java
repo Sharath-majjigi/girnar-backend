@@ -13,8 +13,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -54,7 +61,8 @@ public class SalesHeaderService {
 //        salesHeader.setId(uuid);
         salesHeader.setUser(user);
         salesHeader.setCustomer(customer);
-        salesHeader.setDate(salesHeaderRequest.getDate());
+        Timestamp timestamp=getTimeStamp(salesHeaderRequest);
+        salesHeader.setDate(timestamp);
         salesHeader.setSalesCat(salesHeaderRequest.getSalesCat());
         salesHeader.setDescription(salesHeaderRequest.getDescription());
         salesHeader.setMessage(salesHeaderRequest.getMessage());
@@ -90,9 +98,19 @@ public class SalesHeaderService {
         salesHeader.setSalesDetailList(salesHeaderRequest.getSalesDetailList());
         SalesHeader saved=salesHeaderDAO.save(salesHeader);
         salesHeaderDetailDAO.saveAllAndFlush(details);
-        SalesHeaderResponse response=modelMapper.map(saved,SalesHeaderResponse.class);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>("Sales Header created Successfully with ID: "+saved.getId(), HttpStatus.CREATED);
+    }
 
+    private Timestamp getTimeStamp(SalesHeaderRequest salesHeaderRequest) {
+        String dateString = salesHeaderRequest.getDate();
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(dateString, dateFormatter);
+
+        LocalTime currentTime = LocalTime.now(ZoneId.of("Asia/Jakarta")); // Get the current time
+        LocalDateTime localDateTime = LocalDateTime.of(localDate, currentTime);
+
+        Timestamp timestamp = Timestamp.valueOf(localDateTime);
+        return timestamp;
     }
 
     public ResponseEntity<?> getAllSalesHeader() {
@@ -107,24 +125,36 @@ public class SalesHeaderService {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
+    @Transactional
     public ResponseEntity<?> updateSalesHeader(Integer id, UpdateSalesHeader updateSalesHeader){
         SalesHeader salesHeader=salesHeaderDAO.findById(id).orElseThrow(() -> new ResourceNotFoundException("SalesHeader","Id",String.valueOf(id)));
 
         List<UpdateSalesDetail> updateSalesDetails=updateSalesHeader.getSalesDetailList();
-        for(int i=0; i<updateSalesDetails.size(); i++){
-            UpdateSalesDetail updateSalesDetail=updateSalesDetails.get(i);
-            SalesDetail salesDetail=salesHeaderDetailDAO.findByIdAndSalesHeaderId(updateSalesDetail.getId(),id);
+        if(updateSalesHeader.getSalesDetailList()!=null){
 
-            if(updateSalesDetail.getPoNumber()!=null){
-                salesDetail.setPoNumber(updateSalesDetail.getPoNumber());
+            for(int i=0; i<updateSalesDetails.size(); i++){
+                UpdateSalesDetail updateSalesDetail=updateSalesDetails.get(i);
+                SalesDetail salesDetail=salesHeaderDetailDAO.findByIdAndSalesHeaderId(updateSalesDetail.getId(),id);
+
+                if(updateSalesDetail.getPoNumber()!=null){
+                    salesDetail.setPoNumber(updateSalesDetail.getPoNumber());
+                }
+                salesHeaderDetailDAO.save(salesDetail);
             }
-            salesHeaderDetailDAO.save(salesDetail);
         }
         if(updateSalesHeader.getDescription()!=null){
             salesHeader.setDescription(updateSalesHeader.getDescription());
         }
         if(updateSalesHeader.getDate()!=null){
-            salesHeader.setDate(updateSalesHeader.getDate());
+            String dateString = updateSalesHeader.getDate();
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate localDate = LocalDate.parse(dateString, dateFormatter);
+
+            LocalTime currentTime = LocalTime.now(ZoneId.of("Asia/Jakarta")); // Get the current time
+            LocalDateTime localDateTime = LocalDateTime.of(localDate, currentTime);
+
+            Timestamp timestamp = Timestamp.valueOf(localDateTime);
+            salesHeader.setDate(timestamp);
         }
         if(updateSalesHeader.getSalesCat()!=null){
             salesHeader.setSalesCat(updateSalesHeader.getSalesCat());
@@ -146,8 +176,8 @@ public class SalesHeaderService {
         }
 
         SalesHeader updatedSalesHeader=salesHeaderDAO.save(salesHeader);
-        SalesHeaderResponse response=modelMapper.map(updatedSalesHeader,SalesHeaderResponse.class);
-        return new ResponseEntity<>(response,HttpStatus.OK);
+//        SalesHeaderResponse response=modelMapper.map(updatedSalesHeader,SalesHeaderResponse.class);
+        return new ResponseEntity<>("Updated SalesHeader: "+updatedSalesHeader.getId(),HttpStatus.OK);
     }
 
     public ResponseEntity<?> deleteSalesHeader(Integer id){
