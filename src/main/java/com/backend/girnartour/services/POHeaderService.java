@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.*;
@@ -119,7 +120,7 @@ public class POHeaderService {
     }
 
     public ResponseEntity<?> getAllPurchaseOrders(){
-        List<PurchaseOrderHeader> orderHeaders=poHeaderDAO.findAll();
+        List<PurchaseOrderHeader> orderHeaders=poHeaderDAO.findAllByDescendingID();
         List<POHeaderResponse> responses=orderHeaders.stream().map(orders -> modelMapper.map(orders,POHeaderResponse.class)).collect(Collectors.toList());
         return new ResponseEntity<>(responses,HttpStatus.OK);
     }
@@ -194,6 +195,16 @@ public class POHeaderService {
         }
         poh.setSellAmount(poh.getSellAmt());
         poh.setAmount(poh.getTotalAmt());
+        List<SalesHeader> headers=salesHeaderDAO.findBySalesDetailListPoNumber(id);
+        if(headers!=null){
+            for (SalesHeader salesHeader : headers) {
+                BigDecimal discount = salesHeader.getDiscount();
+                BigDecimal vat = salesHeader.getVatAmt();
+                BigDecimal totalSellAmt = poh.getSellAmt();
+                salesHeader.setTotalInvoiceAmt(totalSellAmt.subtract(discount).add(vat));
+                salesHeaderDAO.save(salesHeader);
+            }
+        }
         PurchaseOrderHeader updatedPOH = poHeaderDAO.save(poh);
         POHeaderResponse responseDTO=modelMapper.map(updatedPOH, POHeaderResponse.class);
         return ResponseEntity.ok(responseDTO);

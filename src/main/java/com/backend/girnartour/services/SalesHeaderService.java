@@ -114,7 +114,7 @@ public class SalesHeaderService {
     }
 
     public ResponseEntity<?> getAllSalesHeader() {
-        List<SalesHeader> salesHeaders=salesHeaderDAO.findAll();
+        List<SalesHeader> salesHeaders=salesHeaderDAO.findAllByDescendingId();
         List<SalesHeaderResponse> salesHeaderResponses=salesHeaders.stream().map(salesHeader -> modelMapper.map(salesHeader,SalesHeaderResponse.class)).collect(Collectors.toList());
         return new ResponseEntity<>(salesHeaderResponses,HttpStatus.OK);
     }

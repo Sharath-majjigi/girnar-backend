@@ -14,17 +14,17 @@ public class CustomerRequest {
 
     @NotEmpty
     public String customerName;
-    @NotEmpty
+
     public String addressLine1;
 
     public String addressLine2;
-    @NotEmpty
+
     public String city;
-    @NotNull
+
     @Size(max=10,min=3,message = "Enter a valid postal code")
     public String postalCode;
 
-    @NotEmpty
+
     public String country;
 
     @NotEmpty

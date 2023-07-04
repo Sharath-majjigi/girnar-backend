@@ -16,6 +16,9 @@ public interface POHeaderDAO extends JpaRepository<PurchaseOrderHeader,Integer> 
 
     List<PurchaseOrderHeader> findByIdNotIn(List<Integer> ids);
 
+    @Query(value = "SELECT * FROM purchase_order_header ORDER BY po_number DESC",nativeQuery = true)
+    List<PurchaseOrderHeader> findAllByDescendingID();
+
 
 
 }
